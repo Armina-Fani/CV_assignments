@@ -1,0 +1,42 @@
+Camera Calibration Report
+==========================
+Number of images used: 22 / 23
+Chessboard pattern (internal corners): 9 x 6
+Square size: 24.0 mm
+Image size: 4284 x 5712 px
+
+Intrinsic matrix K:
+[[4.42142537e+03 0.00000000e+00 2.16933655e+03]
+ [0.00000000e+00 4.43219839e+03 2.78670451e+03]
+ [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
+
+fx = 4421.4254 px, fy = 4432.1984 px
+cx = 2169.3365 px, cy = 2786.7045 px
+
+Distortion coefficients (k1,k2,p1,p2,k3): [ 2.06442444e-01 -8.99492530e-01 -5.94712929e-03 -1.97480635e-04
+  9.56453360e-01]
+
+Mean reprojection error: 1.1332 px
+Per-image reprojection errors:
+  IMG_5508.jpeg: 0.5159 px
+  IMG_5509.jpeg: 0.6500 px
+  IMG_5510.jpeg: 0.8579 px
+  IMG_5511.jpeg: 1.3203 px
+  IMG_5512.jpeg: 1.9108 px
+  IMG_5513.jpeg: 0.9730 px
+  IMG_5514.jpeg: 0.8972 px
+  IMG_5515.jpeg: 0.9902 px
+  IMG_5516.jpeg: 1.7016 px
+  IMG_5517.jpeg: 0.5106 px
+  IMG_5518.jpeg: 1.2306 px
+  IMG_5520.jpeg: 0.7063 px
+  IMG_5521.jpeg: 0.8406 px
+  IMG_5522.jpeg: 1.0143 px
+  IMG_5523.jpeg: 0.8024 px
+  IMG_5526.jpeg: 4.2099 px
+  IMG_5527.jpeg: 0.8771 px
+  IMG_5528.jpeg: 0.9022 px
+  IMG_5529.jpeg: 0.6196 px
+  IMG_5530.jpeg: 0.9820 px
+  IMG_5531.jpeg: 0.9336 px
+  IMG_5532.jpeg: 1.4843 px

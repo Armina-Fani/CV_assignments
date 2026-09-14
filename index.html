@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armina Fani's Computer Vision Homeworks</title>
+<style>
+  body {
+    background: #ffffff;
+    color: #1a3fa0;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+    line-height: 1.5;
+  }
+  h1 {
+    color: #1a3fa0;
+    font-size: 26px;
+    margin-bottom: 4px;
+  }
+  h2 {
+    color: #1a3fa0;
+    font-size: 20px;
+    border-bottom: 1px solid #c9d6f2;
+    padding-bottom: 4px;
+    margin-top: 30px;
+  }
+  a {
+    color: #1a3fa0;
+  }
+
+  /* Tabs */
+  .tabs {
+    margin-top: 20px;
+    border-bottom: 2px solid #c9d6f2;
+  }
+  .tab-button {
+    background: none;
+    border: none;
+    color: #1a3fa0;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+  .tab-button.active {
+    font-weight: bold;
+    border-bottom: 3px solid #1a3fa0;
+  }
+  .tab-content {
+    display: none;
+    padding-top: 20px;
+  }
+  .tab-content.active {
+    display: block;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 10px 0;
+  }
+  td, th {
+    border: 1px solid #c9d6f2;
+    padding: 6px 12px;
+    text-align: left;
+  }
+
+  img {
+    max-width: 100%;
+    border: 1px solid #c9d6f2;
+    margin: 8px 0;
+  }
+
+  .figure {
+    margin: 16px 0;
+  }
+  .figure-caption {
+    font-size: 14px;
+    color: #4a6bb5;
+  }
+
+  video {
+    max-width: 100%;
+    border: 1px solid #c9d6f2;
+  }
+</style>
+</head>
+<body>
+
+<h1>Armina Fani's Computer Vision Homeworks</h1>
+<div>CSc 8830 &mdash; Computer Vision</div>
+
+<div class="tabs">
+  <button class="tab-button active" onclick="showTab('module1')">Module 1</button>
+  <button class="tab-button" onclick="showTab('module2')">Module 2</button>
+</div>
+
+<!-- ============ MODULE 1 (placeholder - fill in when ready) ============ -->
+<div id="module1" class="tab-content active">
+  <h2>Module 1</h2>
+  <p>Coming soon.</p>
+</div>
+
+<!-- ============ MODULE 2 ============ -->
+<div id="module2" class="tab-content">
+  <h2>Module 2: Camera Calibration &amp; Perspective Projection</h2>
+
+  <p>
+    GitHub repo: <a href="https://github.com/Armina-Fani/CV_assignments">https://github.com/Armina-Fani/CV_assignments</a>
+  </p>
+
+  <h2>Step 1: Camera Calibration</h2>
+  <p>
+    Calibrated a smartphone camera using OpenCV's <code>calibrateCamera</code> with 23 photos
+    of a printed 9x6 chessboard pattern taken at varying angles and distances.
+  </p>
+  <table>
+    <tr><th>Image size</th><td>4284 &times; 5712 px</td></tr>
+    <tr><th>fx, fy</th><td>4345.6, 4367.5 px</td></tr>
+    <tr><th>cx, cy</th><td>2148.4, 2759.8 px</td></tr>
+    <tr><th>Distortion coefficients</th><td>0.109, -0.630, -0.008, -0.008, 0.685</td></tr>
+    <tr><th>Mean reprojection error</th><td>~2.0 px</td></tr>
+  </table>
+
+  <div class="figure">
+    <img src="images/calibration_sample.jpg" alt="Sample chessboard calibration photo">
+    <div class="figure-caption">Fig. 1 &mdash; sample chessboard calibration photo (replace with your own image)</div>
+  </div>
+
+  <h2>Step 2: Perspective Projection Measurement</h2>
+  <p>
+    Given a known camera-to-object distance Z, the pinhole projection equations invert to
+    recover real-world (X, Y):
+  </p>
+  <p>
+    u = fx &middot; (X / Z) + cx &nbsp;&rarr;&nbsp; X = (u &minus; cx) &middot; Z / fx<br>
+    v = fy &middot; (Y / Z) + cy &nbsp;&rarr;&nbsp; Y = (v &minus; cy) &middot; Z / fy
+  </p>
+
+  <div class="figure">
+    <img src="images/measured_example.jpg" alt="Example measured object with annotated line">
+    <div class="figure-caption">Fig. 2 &mdash; example measurement (replace with your own annotated image)</div>
+  </div>
+
+  <h2>Step 3: Validation (20 trials)</h2>
+  <p>
+    Each object photographed at a fixed, measured distance; estimated length compared
+    against tape-measured ground truth.
+  </p>
+  <table>
+    <tr><th>Trials</th><td>20</td></tr>
+    <tr><th>Mean error</th><td>-6.66 mm</td></tr>
+    <tr><th>Std dev</th><td>24.63 mm</td></tr>
+    <tr><th>RMSE</th><td>25.51 mm</td></tr>
+    <tr><th>Mean % error</th><td>6.85%</td></tr>
+  </table>
+  <p>
+    Full per-trial results: <a href="validation_results.csv">validation_results.csv</a>
+  </p>
+
+  <h2>Theory: Two-Camera Relationship</h2>
+  <p>
+    Full derivation of the epipolar constraint relating image coordinates of a point P
+    across two cameras: <a href="theory_two_camera_derivation.md">theory_two_camera_derivation.md</a>
+  </p>
+
+  <h2>Demonstration Video</h2>
+  <div class="figure">
+    <video controls>
+      <source src="videos/demo.mp4" type="video/mp4">
+      Your browser does not support the video tag. <a href="videos/demo.mp4">Download the video</a> instead.
+    </video>
+    <div class="figure-caption">Screen recording of the working system (replace videos/demo.mp4 with your own file)</div>
+  </div>
+
+  <h2>Code</h2>
+  <ul>
+    <li><a href="calibrate_camera.py">calibrate_camera.py</a> &mdash; Step 1 calibration script</li>
+    <li><a href="measure_object.py">measure_object.py</a> &mdash; Step 2/3 measurement &amp; validation script</li>
+  </ul>
+</div>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-button').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
