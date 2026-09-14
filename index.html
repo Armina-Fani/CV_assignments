@@ -107,69 +107,60 @@
   <h2>Step 1: Camera Calibration</h2>
   <p>
     Calibrated a smartphone camera using OpenCV's <code>calibrateCamera</code> with 23 photos
-    of a printed 9x6 chessboard pattern taken at varying angles and distances.
+    of a printed 9x6 chessboard pattern taken at varying angles and distances. My calibration metrics are included in the table below.
   </p>
   <table>
     <tr><th>Image size</th><td>4284 &times; 5712 px</td></tr>
-    <tr><th>fx, fy</th><td>4345.6, 4367.5 px</td></tr>
-    <tr><th>cx, cy</th><td>2148.4, 2759.8 px</td></tr>
-    <tr><th>Distortion coefficients</th><td>0.109, -0.630, -0.008, -0.008, 0.685</td></tr>
-    <tr><th>Mean reprojection error</th><td>~2.0 px</td></tr>
+    <tr><th>fx, fy</th><td>4421.4254, 4432.1984 px</td></tr>
+    <tr><th>cx, cy</th><td>2169.3365, 2786.7045 px</td></tr>
+    <tr><th>Distortion coefficients (k1,k2,p1,p2,k3)</th><td>2.06442444e-01, -8.99492530e-01, -5.94712929e-03, -1.97480635e-04, 9.56453360e-01</td></tr>
+    <tr><th>Mean reprojection error</th><td>~1.1332 px</td></tr>
   </table>
 
   <div class="figure">
     <img src="module2/calibrationImages/IMG_5508 Medium.jpeg" alt="Sample chessboard calibration photo">
-    <div class="figure-caption">Fig. 1 &mdash; sample chessboard calibration photo (replace with your own image)</div>
+    <div class="figure-caption">Fig. 1 &mdash; sample chessboard calibration photo</div>
   </div>
   <p>
-    All calibration images can be found here: <a href="module2/calibrationImages">calibrationImages</a>
-  </p>
-
-  <h2>Step 2: Perspective Projection Measurement</h2>
-  <p>
-    Given a known camera-to-object distance Z, the pinhole projection equations invert to
-    recover real-world (X, Y):
+    All calibration images can be found here: <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/calibrationImages">calibrationImages</a>
   </p>
   <p>
-    u = fx &middot; (X / Z) + cx &nbsp;&rarr;&nbsp; X = (u &minus; cx) &middot; Z / fx<br>
-    v = fy &middot; (Y / Z) + cy &nbsp;&rarr;&nbsp; Y = (v &minus; cy) &middot; Z / fy
+    The full calibration report, including per image projection errors, can be found here: <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/calibration_report.txt">calibration_report.txt</a>
   </p>
 
+  <h2>Step 2: Validation</h2>
+  <p>
+    I took pictures of 20 different objects all at 2103 mm away, and used projection equations to estimate the width of each object. Below I include a sample image taken by me and measured image given to me by the script, as well as error statistics.
+  </p>
   <div class="figure">
-    <img src="module2/measuredImages/animal_measured Large.jpeg" alt="Example measured object with annotated line">
-    <div class="figure-caption">Fig. 2 &mdash; example measurement for 1/20 objects</div>
+    <img src="module2/objects/animal Large.jpeg" alt="Example measured object with annotated line">
+    <div class="figure-caption">Fig. 2 &mdash; example photograph of an object at 2103 mm away</div>
   </div>
-
-  <h2>Step 3: Validation (20 trials)</h2>
+  <div class="figure">
+    <img src="module2/objetcs/measuredImages/animal_measured Large.jpeg" alt="Example measured object with annotated line">
+    <div class="figure-caption">Fig. 3 &mdash; example measurement for the previous image</div>
+  </div>
+  
   <p>
-    Each object photographed at a fixed, measured distance; estimated length compared
-    against tape-measured ground truth.
+    Error statistics are:
   </p>
   <table>
     <tr><th>Trials</th><td>20</td></tr>
-    <tr><th>Mean error</th><td>-6.66 mm</td></tr>
-    <tr><th>Std dev</th><td>24.63 mm</td></tr>
-    <tr><th>RMSE</th><td>25.51 mm</td></tr>
-    <tr><th>Mean % error</th><td>6.85%</td></tr>
+    <tr><th>Mean error</th><td>--6.658407678309060 mm</td></tr>
+    <tr><th>Std dev</th><td>24.629974326544800 mm</td></tr>
+    <tr><th>RMSE</th><td>25.514114292618900 mm</td></tr>
+    <tr><th>Mean % error</th><td>6.854482325404110%</td></tr>
   </table>
   <p>
-    Full per-trial results: <a href="module2/objects/validation_results.csv">validation_results.csv</a>
+    All object images can be found here: <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/objects/">object images</a>
+  </p>
+  <p>
+    All measured object images (output of script) can be found here: <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/objects/measuredImages/">measured object images</a>
+  </p>
+  <p>
+    Full per-trial results and error statistics: <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/objects/validation_results.csv">validation_results.csv</a>
   </p>
 
-  <h2>Demonstration Video</h2>
-  <div class="figure">
-    <video controls>
-      <source src="videos/demo.mp4" type="video/mp4">
-      Your browser does not support the video tag. <a href="videos/demo.mp4">Download the video</a> instead.
-    </video>
-    <div class="figure-caption">Screen recording of the working system (replace videos/demo.mp4 with your own file)</div>
-  </div>
-
-  <h2>Code</h2>
-  <ul>
-    <li><a href="calibrate_camera.py">calibrate_camera.py</a> &mdash; Step 1 calibration script</li>
-    <li><a href="measure_object.py">measure_object.py</a> &mdash; Step 2/3 measurement &amp; validation script</li>
-  </ul>
 </div>
 
 <script>
