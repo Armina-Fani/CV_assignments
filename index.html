@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armina Fani's Computer Vision Assignments</title>
+
+<style>
+  body {
+    background: #fff;
+    color: #1a3fa0;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 900px;
+    margin: auto;
+    padding: 24px;
+    line-height: 1.5;
+  }
+
+  h1 { font-size: 26px; margin-bottom: 4px; }
+  h2 {
+    font-size: 20px;
+    border-bottom: 1px solid #c9d6f2;
+    padding-bottom: 4px;
+    margin-top: 30px;
+  }
+
+  a { color: #1a3fa0; }
+
+  .tabs {
+    margin-top: 20px;
+    border-bottom: 2px solid #c9d6f2;
+  }
+
+  .tab-button {
+    background: none;
+    border: none;
+    color: #1a3fa0;
+    font-size: 16px;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+
+  .tab-button.active {
+    font-weight: bold;
+    border-bottom: 3px solid #1a3fa0;
+  }
+
+  .tab-content { display: none; padding-top: 20px; }
+  .tab-content.active { display: block; }
+
+  table {
+    border-collapse: collapse;
+    margin: 10px 0;
+    max-width: 100%;
+  }
+
+  td, th {
+    border: 1px solid #c9d6f2;
+    padding: 6px 12px;
+    text-align: left;
+  }
+
+  img, video {
+    max-width: 100%;
+    border: 1px solid #c9d6f2;
+  }
+
+  .figure { margin: 16px 0; }
+
+  .figure-caption {
+    font-size: 14px;
+    color: #4a6bb5;
+  }
+
+  .application {
+    background: #f5f8ff;
+    border: 1px solid #c9d6f2;
+    border-radius: 8px;
+    padding: 18px;
+    margin: 18px 0;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  input {
+    padding: 8px;
+    border: 1px solid #9eb1dc;
+    border-radius: 4px;
+  }
+
+  button.action {
+    background: #1a3fa0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 14px;
+    cursor: pointer;
+  }
+
+  button.action:disabled {
+    background: #8795b7;
+    cursor: not-allowed;
+  }
+
+  #imageCanvas {
+    display: none;
+    width: 100%;
+    height: auto;
+    cursor: crosshair;
+    border: 1px solid #9eb1dc;
+    margin-top: 12px;
+  }
+
+  #instructions {
+    font-weight: bold;
+  }
+
+  #measurementResult {
+    display: none;
+    background: white;
+    border-left: 5px solid #1a3fa0;
+    padding: 12px;
+    margin-top: 14px;
+    font-size: 18px;
+  }
+
+  .warning {
+    display: none;
+    color: #8a3b00;
+    background: #fff3df;
+    padding: 8px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Armina Fani's Computer Vision Assignments</h1>
+<div>CSc 8830 &mdash; Computer Vision</div>
+
+<div class="tabs">
+  <button class="tab-button active"
+          onclick="showTab('module2', this)">Module 2</button>
+</div>
+
+<div id="module2" class="tab-content active">
+
+  <h2>Module 2: Camera Calibration &amp; Perspective Projection</h2>
+
+  <p>
+    GitHub repository:
+    <a href="https://github.com/Armina-Fani/CV_assignments">
+      CV_assignments
+    </a>
+  </p>
+
+  <h2>Step 1: Camera Calibration</h2>
+
+  <p>
+    I calibrated a smartphone camera using OpenCV's
+    <code>calibrateCamera</code> with 23 photographs of a printed 9 × 6
+    chessboard taken at different positions, distances, and orientations.
+  </p>
+
+  <table>
+    <tr><th>Image size</th><td>4284 × 5712 px</td></tr>
+    <tr><th>fx, fy</th><td>4421.4254, 4432.1984 px</td></tr>
+    <tr><th>cx, cy</th><td>2169.3365, 2786.7045 px</td></tr>
+    <tr>
+      <th>Distortion coefficients</th>
+      <td>0.206442444, −0.899492530, −0.005947129, −0.000197481, 0.956453360</td>
+    </tr>
+    <tr><th>Mean reprojection error</th><td>1.1332 px</td></tr>
+  </table>
+
+  <div class="figure">
+    <img src="module2/calibrationImages/IMG_5508 Medium.jpeg"
+         alt="Chessboard calibration photograph">
+    <div class="figure-caption">
+      Fig. 1 — Sample chessboard calibration photograph
+    </div>
+  </div>
+
+  <p>
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/calibrationImages">
+      View calibration images
+    </a>
+    |
+    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module2/calibration_report.txt">
+      View calibration report
+    </a>
+  </p>
+
+  <h2>Step 2: Interactive Object Measurement</h2>
+
+  <p>
+    This browser application implements the same perspective-projection
+    equations as <code>measureObject.py</code>. Both selected endpoints are
+    assumed to lie at the entered depth from the camera.
+  </p>
+
+  <div class="application">
+
+    <div class="controls">
+      <div>
+        <label for="imageInput">Object image</label>
+        <input id="imageInput" type="file" accept="image/*">
+      </div>
+
+      <div>
+        <label for="distanceInput">Camera distance Z (mm)</label>
+        <input id="distanceInput"
+               type="number"
+               min="1"
+               step="0.1"
+               value="2103">
+      </div>
+
+      <button class="action" onclick="resetPoints()">
+        Reset points
+      </button>
+
+      <button id="downloadButton"
+              class="action"
+              onclick="downloadResult()"
+              disabled>
+        Download result
+      </button>
+    </div>
+
+    <div id="instructions">
+      Upload an image, then click the two endpoints of the dimension being
+      measured.
+    </div>
+
+    <div id="dimensionWarning" class="warning"></div>
+
+    <canvas id="imageCanvas"></canvas>
+
+    <div id="measurementResult"></div>
+  </div>
+
+  <p>
+    The computation is:
+  </p>
+
+  <p>
+    <code>X = (u − cx)Z/fx</code>,
+    <code>Y = (v − cy)Z/fy</code>, and
+    <code>D = √[(X₂ − X₁)² + (Y₂ − Y₁)²]</code>.
+  </p>
+
+  <h2>Step 3: Experimental Validation</h2>
+
+  <p>
+    Twenty objects were photographed from a measured camera-to-object
+    distance of 2103 mm. Their dimensions were estimated using perspective
+    projection and compared with their known dimensions.
+  </p>
+
+  <div class="figure">
+    <img src="module2/objects/animal Large.jpeg"
+         alt="Example validation object">
+    <div class="figure-caption">
+      Fig. 2 — Example object photographed from 2103 mm
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="module2/objects/measuredImages/animal_measured Large.jpeg"
+         alt="Annotated measurement result">
+    <div class="figure-caption">
+      Fig. 3 — Measurement produced by the Python script
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Trials</th><td>20</td></tr>
+    <tr><th>Mean error</th><td>−6.6584 mm</td></tr>
+    <tr><th>Standard deviation</th><td>24.6300 mm</td></tr>
+    <tr><th>RMSE</th><td>25.5141 mm</td></tr>
+    <tr><th>Mean percentage error</th><td>6.8545%</td></tr>
+  </table>
+
+  <p>
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/objects">
+      Object images
+    </a>
+    |
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/objects/measuredImages">
+      Measured images
+    </a>
+    |
+    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module2/objects/validation_results.csv">
+      Validation results
+    </a>
+  </p>
+
+  <p>
+    Demonstration video:
+    <a href="https://youtu.be/fY_xEQqkIoM">Watch on YouTube</a>
+  </p>
+
+</div>
+
+<script>
+  // Original calibration-image dimensions
+  const calibrationWidth = 4284;
+  const calibrationHeight = 5712;
+
+  // Intrinsic calibration parameters
+  const originalFx = 4421.4254;
+  const originalFy = 4432.1984;
+  const originalCx = 2169.3365;
+  const originalCy = 2786.7045;
+
+  const canvas = document.getElementById("imageCanvas");
+  const context = canvas.getContext("2d");
+  const resultBox = document.getElementById("measurementResult");
+  const instructions = document.getElementById("instructions");
+  const downloadButton = document.getElementById("downloadButton");
+  const warningBox = document.getElementById("dimensionWarning");
+
+  let loadedImage = null;
+  let selectedPoints = [];
+
+  function showTab(id, button) {
+    document.querySelectorAll(".tab-content").forEach(element => {
+      element.classList.remove("active");
+    });
+
+    document.querySelectorAll(".tab-button").forEach(element => {
+      element.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+    button.classList.add("active");
+  }
+
+  document.getElementById("imageInput").addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const image = new Image();
+
+    image.onload = function () {
+      loadedImage = image;
+      selectedPoints = [];
+
+      // Limit display size without changing measurement accuracy.
+      const maximumCanvasDimension = 1400;
+      const displayScale = Math.min(
+        1,
+        maximumCanvasDimension / Math.max(image.naturalWidth, image.naturalHeight)
+      );
+
+      canvas.width = Math.round(image.naturalWidth * displayScale);
+      canvas.height = Math.round(image.naturalHeight * displayScale);
+      canvas.style.display = "block";
+
+      const calibrationRatio = calibrationWidth / calibrationHeight;
+      const uploadedRatio = image.naturalWidth / image.naturalHeight;
+      const ratioDifference = Math.abs(uploadedRatio - calibrationRatio);
+
+      if (ratioDifference > 0.03) {
+        warningBox.style.display = "block";
+        warningBox.textContent =
+          "Warning: this image has a different orientation or aspect ratio " +
+          "from the 4284 × 5712 calibration images. For reliable results, " +
+          "use images from the calibrated camera with the same orientation, " +
+          "resolution settings, and zoom.";
+      } else {
+        warningBox.style.display = "none";
+      }
+
+      resultBox.style.display = "none";
+      downloadButton.disabled = true;
+      instructions.textContent =
+        "Click the first endpoint of the object dimension.";
+
+      redrawCanvas();
+    };
+
+    image.src = URL.createObjectURL(file);
+  });
+
+  canvas.addEventListener("click", event => {
+    if (!loadedImage || selectedPoints.length >= 2) return;
+
+    const rectangle = canvas.getBoundingClientRect();
+
+    const x = (event.clientX - rectangle.left) *
+              (canvas.width / rectangle.width);
+
+    const y = (event.clientY - rectangle.top) *
+              (canvas.height / rectangle.height);
+
+    selectedPoints.push({ x, y });
+
+    if (selectedPoints.length === 1) {
+      instructions.textContent =
+        "First point selected. Click the second endpoint.";
+    } else {
+      calculateMeasurement();
+    }
+
+    redrawCanvas();
+  });
+
+  function calculateMeasurement() {
+    const distanceZ =
+      Number(document.getElementById("distanceInput").value);
+
+    if (!Number.isFinite(distanceZ) || distanceZ <= 0) {
+      alert("Enter a valid positive camera distance in millimeters.");
+      selectedPoints = [];
+      redrawCanvas();
+      return;
+    }
+
+    /*
+      Scale the intrinsic matrix from the original calibration resolution
+      to the resized browser canvas.
+    */
+    const scaleX = canvas.width / calibrationWidth;
+    const scaleY = canvas.height / calibrationHeight;
+
+    const fx = originalFx * scaleX;
+    const fy = originalFy * scaleY;
+    const cx = originalCx * scaleX;
+    const cy = originalCy * scaleY;
+
+    const first = selectedPoints[0];
+    const second = selectedPoints[1];
+
+    const X1 = (first.x - cx) * distanceZ / fx;
+    const Y1 = (first.y - cy) * distanceZ / fy;
+    const X2 = (second.x - cx) * distanceZ / fx;
+    const Y2 = (second.y - cy) * distanceZ / fy;
+
+    const distanceMillimeters = Math.sqrt(
+      Math.pow(X2 - X1, 2) +
+      Math.pow(Y2 - Y1, 2)
+    );
+
+    resultBox.dataset.distance = distanceMillimeters.toString();
+    resultBox.style.display = "block";
+
+    resultBox.innerHTML =
+      "<strong>Estimated dimension:</strong> " +
+      distanceMillimeters.toFixed(2) + " mm (" +
+      (distanceMillimeters / 10).toFixed(2) + " cm)<br>" +
+      "<small>P1 = (" + X1.toFixed(2) + ", " + Y1.toFixed(2) +
+      ") mm; P2 = (" + X2.toFixed(2) + ", " +
+      Y2.toFixed(2) + ") mm at Z = " +
+      distanceZ.toFixed(2) + " mm.</small>";
+
+    instructions.textContent =
+      "Measurement complete. Reset the points to measure again.";
+
+    downloadButton.disabled = false;
+  }
+
+  function redrawCanvas() {
+    if (!loadedImage) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
+
+    context.lineWidth = Math.max(3, canvas.width / 400);
+    context.font = `bold ${Math.max(18, canvas.width / 35)}px Arial`;
+
+    selectedPoints.forEach(point => {
+      context.beginPath();
+      context.arc(
+        point.x,
+        point.y,
+        Math.max(6, canvas.width / 180),
+        0,
+        Math.PI * 2
+      );
+      context.fillStyle = "red";
+      context.fill();
+    });
+
+    if (selectedPoints.length === 2) {
+      const first = selectedPoints[0];
+      const second = selectedPoints[1];
+
+      context.beginPath();
+      context.moveTo(first.x, first.y);
+      context.lineTo(second.x, second.y);
+      context.strokeStyle = "#00d000";
+      context.stroke();
+
+      const distance = Number(resultBox.dataset.distance);
+      if (Number.isFinite(distance)) {
+        const middleX = (first.x + second.x) / 2;
+        const middleY = (first.y + second.y) / 2;
+
+        const label =
+          distance.toFixed(1) + " mm (" +
+          (distance / 10).toFixed(2) + " cm)";
+
+        context.lineWidth = 5;
+        context.strokeStyle = "black";
+        context.strokeText(label, middleX + 10, middleY - 10);
+        context.fillStyle = "#00ff00";
+        context.fillText(label, middleX + 10, middleY - 10);
+      }
+    }
+  }
+
+  function resetPoints() {
+    selectedPoints = [];
+    resultBox.style.display = "none";
+    delete resultBox.dataset.distance;
+    downloadButton.disabled = true;
+
+    instructions.textContent = loadedImage
+      ? "Click the first endpoint of the object dimension."
+      : "Upload an image, then click the two endpoints.";
+
+    redrawCanvas();
+  }
+
+  function downloadResult() {
+    if (selectedPoints.length !== 2) return;
+
+    const link = document.createElement("a");
+    link.download = "measured_object.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+</script>
+
+</body>
+</html>
