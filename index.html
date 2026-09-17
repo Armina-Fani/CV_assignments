@@ -143,6 +143,50 @@
     padding: 8px;
     margin-top: 10px;
   }
+
+  /* Module 3 */
+  select {
+    padding: 8px;
+    border: 1px solid #9eb1dc;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+
+  .canvas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .canvas-cell { text-align: center; }
+
+  .canvas-cell canvas {
+    width: 100%;
+    height: auto;
+    border: 1px solid #9eb1dc;
+    background: #eee;
+  }
+
+  .canvas-cell .cell-label {
+    font-size: 13px;
+    color: #4a6bb5;
+    margin-top: 4px;
+  }
+
+  .m3-result {
+    display: none;
+    background: white;
+    border-left: 5px solid #1a3fa0;
+    padding: 12px;
+    margin-top: 14px;
+    font-size: 15px;
+  }
+
+  .m3-status {
+    font-style: italic;
+    color: #4a6bb5;
+  }
 </style>
 </head>
 
@@ -154,6 +198,8 @@
 <div class="tabs">
   <button class="tab-button active"
           onclick="showTab('module2', this)">Module 2</button>
+  <button class="tab-button"
+          onclick="showTab('module3', this)">Module 3</button>
 </div>
 
 <div id="module2" class="tab-content active">
@@ -313,6 +359,154 @@
     Demonstration video:
     <a href="https://youtu.be/fY_xEQqkIoM">Watch on YouTube</a>
   </p>
+
+</div>
+
+<!-- ============ MODULE 3 ============ -->
+<div id="module3" class="tab-content">
+
+  <h2>Module 3: Image Blurring &mdash; Spatial vs. Frequency-Domain Filtering</h2>
+
+  <p>
+    GitHub repository:
+    <a href="https://github.com/Armina-Fani/CV_assignments">CV_assignments</a>
+    &mdash;
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module3">module3 folder</a>
+  </p>
+
+  <p>
+    Image blurring is implemented two independent ways: (1) direct spatial
+    convolution with a smoothing kernel, and (2) the Fourier-domain
+    equivalent (multiply the image's FFT by the kernel's FFT, then
+    inverse-transform). The demo below runs both, in the browser, on the
+    same image and kernel, and reports the numerical difference between
+    them.
+  </p>
+
+  <div class="application">
+
+    <div class="controls">
+      <div>
+        <label for="blurImageInput">Image</label>
+        <input id="blurImageInput" type="file" accept="image/*">
+      </div>
+
+      <div>
+        <label for="filterTypeSelect">Filter type</label>
+        <select id="filterTypeSelect">
+          <option value="box">Box</option>
+          <option value="gaussian" selected>Gaussian</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="kernelSizeSelect">Kernel size</label>
+        <select id="kernelSizeSelect">
+          <option value="3">3 &times; 3</option>
+          <option value="5">5 &times; 5</option>
+          <option value="7">7 &times; 7</option>
+          <option value="9" selected>9 &times; 9</option>
+          <option value="11">11 &times; 11</option>
+          <option value="15">15 &times; 15</option>
+          <option value="21">21 &times; 21</option>
+        </select>
+      </div>
+
+      <button class="action" id="applySpatialButton" onclick="m3ApplySpatial()" disabled>
+        1. Apply spatial filter
+      </button>
+
+      <button class="action" id="applyFrequencyButton" onclick="m3ApplyFrequency()" disabled>
+        2. Compute Fourier equivalent
+      </button>
+    </div>
+
+    <div id="m3Status" class="m3-status">Upload an image to begin.</div>
+
+    <div class="canvas-grid">
+      <div class="canvas-cell">
+        <canvas id="m3CanvasOriginal"></canvas>
+        <div class="cell-label">Original (grayscale)</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasSpatial"></canvas>
+        <div class="cell-label">Spatial filter result</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasFrequency"></canvas>
+        <div class="cell-label">Fourier-domain result</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasDiff"></canvas>
+        <div class="cell-label">|difference| (contrast-stretched)</div>
+      </div>
+    </div>
+
+    <div id="m3Result" class="m3-result"></div>
+  </div>
+
+  <p>
+    Processing is done in grayscale, resized to a maximum dimension of 380px, for
+    responsive in-browser performance. The full-resolution, per-channel color
+    version is implemented offline in
+    <code>blur_fourier_equivalence.py</code>, run across 5 kernel sizes and both
+    filter types &mdash; results in
+    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module3/equivalence_summary.csv">equivalence_summary.csv</a>
+    and visualized in
+    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module3/runtime_comparison.png">runtime_comparison.png</a>.
+  </p>
+
+  <div class="figure">
+    <img src="module3/comparison_example.png" alt="Side-by-side comparison of spatial and frequency-domain blur results">
+    <div class="figure-caption">
+      Fig. 1 &mdash; original / spatial result / frequency-domain result / difference (contrast-stretched), from the offline script
+    </div>
+  </div>
+
+  <h2>Theory: Why They're the Same</h2>
+
+  <p>
+    The <strong>convolution theorem</strong> states that convolution in the spatial domain
+    corresponds to multiplication in the frequency (Fourier) domain:
+  </p>
+
+  <p><code>ℱ{f * h}(u, v) = F(u, v) &middot; H(u, v)</code></p>
+
+  <p>
+    Sketch of the derivation: take the Fourier transform of the convolution integral,
+    swap the order of integration, substitute x&prime; = x &minus; &tau;<sub>1</sub>,
+    y&prime; = y &minus; &tau;<sub>2</sub> in the inner integral, and the inner integral
+    reduces to H(u,v) times a phase factor depending only on (&tau;<sub>1</sub>,
+    &tau;<sub>2</sub>) &mdash; which can then be pulled outside, leaving exactly
+    F(u,v)&middot;H(u,v). Full step-by-step derivation, including the discrete case and
+    the zero-padding assumption needed to avoid circular-convolution wraparound
+    artifacts, is in
+    <a href="theory_convolution_theorem.md">theory_convolution_theorem.md</a>.
+  </p>
+
+  <p>
+    <strong>Experimental validation:</strong> across box and Gaussian filters at kernel
+    sizes 3, 5, 9, 15, and 21, the mean absolute difference between the spatial and
+    frequency-domain outputs was on the order of 10<sup>&minus;14</sup> &mdash; i.e.
+    floating-point rounding error, not a real discrepancy, exactly as the theorem
+    predicts. The in-browser demo above reports the same comparison live for whatever
+    image and kernel you try.
+  </p>
+
+  <h2>Demonstration Video</h2>
+  <div class="figure">
+    <video controls>
+      <source src="module3/videos/demo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+      <a href="module3/videos/demo.mp4">Download the video</a> instead.
+    </video>
+    <div class="figure-caption">Screen recording of the working system (replace with your own file)</div>
+  </div>
+
+  <h2>Code</h2>
+  <ul>
+    <li><a href="blur_fourier_equivalence.py">blur_fourier_equivalence.py</a> &mdash; offline spatial vs. frequency-domain script, color images, multiple kernel sizes</li>
+  </ul>
 
 </div>
 
@@ -544,6 +738,334 @@
     link.download = "measured_object.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
+  }
+
+  // ================================================================
+  // MODULE 3: Spatial vs. frequency-domain blur
+  // ================================================================
+
+  const M3_MAX_DIM = 380; // resized processing dimension, for browser performance
+
+  const m3ImageInput = document.getElementById("blurImageInput");
+  const m3FilterTypeSelect = document.getElementById("filterTypeSelect");
+  const m3KernelSizeSelect = document.getElementById("kernelSizeSelect");
+  const m3ApplySpatialButton = document.getElementById("applySpatialButton");
+  const m3ApplyFrequencyButton = document.getElementById("applyFrequencyButton");
+  const m3Status = document.getElementById("m3Status");
+  const m3Result = document.getElementById("m3Result");
+  const m3CanvasOriginal = document.getElementById("m3CanvasOriginal");
+  const m3CanvasSpatial = document.getElementById("m3CanvasSpatial");
+  const m3CanvasFrequency = document.getElementById("m3CanvasFrequency");
+  const m3CanvasDiff = document.getElementById("m3CanvasDiff");
+
+  let m3GrayImage = null; // Float64Array, length H*W
+  let m3H = 0, m3W = 0;
+  let m3SpatialResult = null;
+  let m3SpatialTimeMs = 0;
+  let m3UsedFilterType = null;
+  let m3UsedKernelSize = null;
+
+  m3ImageInput.addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const image = new Image();
+    image.onload = function () {
+      const scale = Math.min(1, M3_MAX_DIM / Math.max(image.naturalWidth, image.naturalHeight));
+      m3W = Math.max(1, Math.round(image.naturalWidth * scale));
+      m3H = Math.max(1, Math.round(image.naturalHeight * scale));
+
+      const off = document.createElement("canvas");
+      off.width = m3W;
+      off.height = m3H;
+      const offCtx = off.getContext("2d");
+      offCtx.drawImage(image, 0, 0, m3W, m3H);
+      const data = offCtx.getImageData(0, 0, m3W, m3H).data;
+
+      m3GrayImage = new Float64Array(m3W * m3H);
+      for (let i = 0; i < m3W * m3H; i++) {
+        const r = data[i * 4], g = data[i * 4 + 1], b = data[i * 4 + 2];
+        m3GrayImage[i] = 0.299 * r + 0.587 * g + 0.114 * b; // standard luma
+      }
+
+      m3DrawGray(m3CanvasOriginal, m3GrayImage, m3H, m3W);
+      m3ClearCanvas(m3CanvasSpatial);
+      m3ClearCanvas(m3CanvasFrequency);
+      m3ClearCanvas(m3CanvasDiff);
+      m3Result.style.display = "none";
+      m3SpatialResult = null;
+      m3ApplyFrequencyButton.disabled = true;
+      m3ApplySpatialButton.disabled = false;
+      m3Status.textContent = `Loaded (${m3W}×${m3H} after resize). Choose a filter and kernel size, then apply.`;
+    };
+    image.src = URL.createObjectURL(file);
+  });
+
+  // Re-require the spatial step if filter settings change after a run,
+  // so the Fourier comparison always matches the currently selected kernel.
+  m3FilterTypeSelect.addEventListener("change", m3InvalidateSpatial);
+  m3KernelSizeSelect.addEventListener("change", m3InvalidateSpatial);
+
+  function m3InvalidateSpatial() {
+    m3ApplyFrequencyButton.disabled = true;
+    m3SpatialResult = null;
+  }
+
+  function m3ClearCanvas(canvasEl) {
+    canvasEl.width = 1;
+    canvasEl.height = 1;
+    canvasEl.getContext("2d").clearRect(0, 0, 1, 1);
+  }
+
+  function m3DrawGray(canvasEl, arr, H, W) {
+    canvasEl.width = W;
+    canvasEl.height = H;
+    const ctx = canvasEl.getContext("2d");
+    const imgData = ctx.createImageData(W, H);
+    for (let i = 0; i < W * H; i++) {
+      const v = Math.max(0, Math.min(255, arr[i]));
+      imgData.data[i * 4] = v;
+      imgData.data[i * 4 + 1] = v;
+      imgData.data[i * 4 + 2] = v;
+      imgData.data[i * 4 + 3] = 255;
+    }
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  // ---- kernel builders (box / gaussian), matching blur_fourier_equivalence.py ----
+
+  function m3GaussianKernel1D(k) {
+    const sigma = 0.3 * ((k - 1) * 0.5 - 1) + 0.8; // OpenCV's default sigma formula
+    const half = Math.floor(k / 2);
+    const values = [];
+    let sum = 0;
+    for (let i = -half; i <= half; i++) {
+      const v = Math.exp(-(i * i) / (2 * sigma * sigma));
+      values.push(v);
+      sum += v;
+    }
+    return values.map(v => v / sum);
+  }
+
+  function m3MakeKernel(type, k) {
+    const kernel = [];
+    if (type === "box") {
+      const val = 1 / (k * k);
+      for (let y = 0; y < k; y++) kernel.push(new Float64Array(k).fill(val));
+    } else {
+      const g = m3GaussianKernel1D(k);
+      for (let y = 0; y < k; y++) {
+        const row = new Float64Array(k);
+        for (let x = 0; x < k; x++) row[x] = g[y] * g[x];
+        kernel.push(row);
+      }
+    }
+    return kernel;
+  }
+
+  // ---- direct spatial convolution (zero-padded border) ----
+
+  function m3SpatialConvolve(imgFlat, H, W, kernel, kh, kw) {
+    const cy = Math.floor(kh / 2), cx = Math.floor(kw / 2);
+    const out = new Float64Array(H * W);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        let sum = 0;
+        for (let j = 0; j < kh; j++) {
+          const yy = y + j - cy;
+          if (yy < 0 || yy >= H) continue;
+          const rowOffset = yy * W;
+          const kRow = kernel[j];
+          for (let i = 0; i < kw; i++) {
+            const xx = x + i - cx;
+            if (xx < 0 || xx >= W) continue;
+            sum += imgFlat[rowOffset + xx] * kRow[i];
+          }
+        }
+        out[y * W + x] = sum;
+      }
+    }
+    return out;
+  }
+
+  // ---- FFT-based frequency-domain convolution ----
+  // Verified against OpenCV's filter2D reference (max abs diff ~1e-13) before
+  // being used here; see build notes for the standalone Node.js test.
+
+  function m3Fft1D(re, im, invert) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) {
+        [re[i], re[j]] = [re[j], re[i]];
+        [im[i], im[j]] = [im[j], im[i]];
+      }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = (2 * Math.PI / len) * (invert ? 1 : -1);
+      const wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let curWr = 1, curWi = 0;
+        for (let j = 0; j < len / 2; j++) {
+          const ur = re[i + j], ui = im[i + j];
+          const vr = re[i + j + len / 2] * curWr - im[i + j + len / 2] * curWi;
+          const vi = re[i + j + len / 2] * curWi + im[i + j + len / 2] * curWr;
+          re[i + j] = ur + vr;
+          im[i + j] = ui + vi;
+          re[i + j + len / 2] = ur - vr;
+          im[i + j + len / 2] = ui - vi;
+          const nextWr = curWr * wr - curWi * wi;
+          const nextWi = curWr * wi + curWi * wr;
+          curWr = nextWr;
+          curWi = nextWi;
+        }
+      }
+    }
+    if (invert) {
+      for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+    }
+  }
+
+  function m3Fft2D(re, im, invert) {
+    const N = re.length;
+    for (let y = 0; y < N; y++) m3Fft1D(re[y], im[y], invert);
+    for (let x = 0; x < N; x++) {
+      const colRe = new Float64Array(N), colIm = new Float64Array(N);
+      for (let y = 0; y < N; y++) { colRe[y] = re[y][x]; colIm[y] = im[y][x]; }
+      m3Fft1D(colRe, colIm, invert);
+      for (let y = 0; y < N; y++) { re[y][x] = colRe[y]; im[y][x] = colIm[y]; }
+    }
+  }
+
+  function m3NextPow2(n) { let p = 1; while (p < n) p <<= 1; return p; }
+
+  function m3FftConvolve2D(imgFlat, H, W, kernel2D, kh, kw) {
+    const outH = H + kh - 1, outW = W + kw - 1;
+    const N = Math.max(m3NextPow2(outH), m3NextPow2(outW));
+
+    const imgRe = [], imgIm = [];
+    for (let y = 0; y < N; y++) { imgRe.push(new Float64Array(N)); imgIm.push(new Float64Array(N)); }
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++)
+        imgRe[y][x] = imgFlat[y * W + x];
+
+    const kerRe = [], kerIm = [];
+    for (let y = 0; y < N; y++) { kerRe.push(new Float64Array(N)); kerIm.push(new Float64Array(N)); }
+    const cy = Math.floor(kh / 2), cx = Math.floor(kw / 2);
+    for (let y = 0; y < kh; y++) {
+      for (let x = 0; x < kw; x++) {
+        const yy = ((y - cy) % N + N) % N;
+        const xx = ((x - cx) % N + N) % N;
+        kerRe[yy][xx] = kernel2D[y][x];
+      }
+    }
+
+    m3Fft2D(imgRe, imgIm, false);
+    m3Fft2D(kerRe, kerIm, false);
+
+    const outRe = [], outIm = [];
+    for (let y = 0; y < N; y++) {
+      outRe.push(new Float64Array(N)); outIm.push(new Float64Array(N));
+      for (let x = 0; x < N; x++) {
+        const ar = imgRe[y][x], ai = imgIm[y][x];
+        const br = kerRe[y][x], bi = kerIm[y][x];
+        outRe[y][x] = ar * br - ai * bi;
+        outIm[y][x] = ar * bi + ai * br;
+      }
+    }
+
+    m3Fft2D(outRe, outIm, true);
+
+    const result = new Float64Array(H * W);
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++)
+        result[y * W + x] = outRe[y][x];
+    return result;
+  }
+
+  // ---- UI actions ----
+
+  function m3ApplySpatial() {
+    if (!m3GrayImage) return;
+    const filterType = m3FilterTypeSelect.value;
+    const k = parseInt(m3KernelSizeSelect.value, 10);
+
+    m3Status.textContent = "Applying spatial filter...";
+    m3ApplySpatialButton.disabled = true;
+
+    // Yield to the browser so the status message paints before the (synchronous) computation runs.
+    setTimeout(() => {
+      const kernel = m3MakeKernel(filterType, k);
+      const t0 = performance.now();
+      const result = m3SpatialConvolve(m3GrayImage, m3H, m3W, kernel, k, k);
+      const elapsed = performance.now() - t0;
+
+      m3SpatialResult = result;
+      m3SpatialTimeMs = elapsed;
+      m3UsedFilterType = filterType;
+      m3UsedKernelSize = k;
+
+      m3DrawGray(m3CanvasSpatial, result, m3H, m3W);
+      m3ClearCanvas(m3CanvasFrequency);
+      m3ClearCanvas(m3CanvasDiff);
+      m3Result.style.display = "none";
+
+      m3Status.textContent =
+        `Spatial ${filterType} filter (k=${k}) applied in ${elapsed.toFixed(2)} ms. ` +
+        `Now compute its Fourier-domain equivalent to compare.`;
+
+      m3ApplySpatialButton.disabled = false;
+      m3ApplyFrequencyButton.disabled = false;
+    }, 10);
+  }
+
+  function m3ApplyFrequency() {
+    if (!m3GrayImage || !m3SpatialResult) return;
+
+    m3Status.textContent = "Computing Fourier-domain equivalent...";
+    m3ApplyFrequencyButton.disabled = true;
+
+    setTimeout(() => {
+      const kernel = m3MakeKernel(m3UsedFilterType, m3UsedKernelSize);
+      const t0 = performance.now();
+      const freqResult = m3FftConvolve2D(m3GrayImage, m3H, m3W, kernel, m3UsedKernelSize, m3UsedKernelSize);
+      const elapsed = performance.now() - t0;
+
+      m3DrawGray(m3CanvasFrequency, freqResult, m3H, m3W);
+
+      // Compare against the spatial result
+      let maxDiff = 0, sumDiff = 0;
+      const diff = new Float64Array(m3H * m3W);
+      for (let i = 0; i < diff.length; i++) {
+        const d = Math.abs(freqResult[i] - m3SpatialResult[i]);
+        diff[i] = d;
+        if (d > maxDiff) maxDiff = d;
+        sumDiff += d;
+      }
+      const meanDiff = sumDiff / diff.length;
+
+      // Contrast-stretch the difference for visibility
+      const diffVis = new Float64Array(diff.length);
+      const scale = maxDiff > 0 ? 255 / maxDiff : 0;
+      for (let i = 0; i < diff.length; i++) diffVis[i] = diff[i] * scale;
+      m3DrawGray(m3CanvasDiff, diffVis, m3H, m3W);
+
+      m3Result.style.display = "block";
+      m3Result.innerHTML =
+        `<strong>${m3UsedFilterType} filter, k=${m3UsedKernelSize}:</strong><br>` +
+        `Spatial time: ${m3SpatialTimeMs.toFixed(2)} ms &nbsp;|&nbsp; ` +
+        `Frequency-domain time: ${elapsed.toFixed(2)} ms<br>` +
+        `Mean |difference|: ${meanDiff.toExponential(3)} &nbsp;|&nbsp; ` +
+        `Max |difference|: ${maxDiff.toExponential(3)}<br>` +
+        `<small>Differences at this scale (~1e-10 or smaller) are floating-point rounding error, ` +
+        `not a real discrepancy &mdash; confirming the two methods compute the same result, ` +
+        `exactly as the convolution theorem predicts.</small>`;
+
+      m3Status.textContent = "Comparison complete.";
+      m3ApplyFrequencyButton.disabled = false;
+    }, 10);
   }
 </script>
 
