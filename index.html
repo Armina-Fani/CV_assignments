@@ -433,12 +433,16 @@
         <div class="cell-label">Spatial filter result</div>
       </div>
       <div class="canvas-cell">
-        <canvas id="m3CanvasFrequency"></canvas>
-        <div class="cell-label">Fourier-domain result</div>
+        <canvas id="m3CanvasSpecBefore"></canvas>
+        <div class="cell-label">FFT magnitude &mdash; before smoothing</div>
       </div>
       <div class="canvas-cell">
-        <canvas id="m3CanvasDiff"></canvas>
-        <div class="cell-label">|difference| (contrast-stretched)</div>
+        <canvas id="m3CanvasSpecAfter"></canvas>
+        <div class="cell-label">FFT magnitude &mdash; after smoothing (frequency domain)</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasFrequency"></canvas>
+        <div class="cell-label">Turned back to spatial (inverse FFT)</div>
       </div>
     </div>
 
@@ -461,46 +465,6 @@
     <div class="figure-caption">
       Fig. 1 &mdash; original / spatial result / frequency-domain result / difference (contrast-stretched), from the offline script
     </div>
-  </div>
-
-  <h2>Theory: Why They're the Same</h2>
-
-  <p>
-    The <strong>convolution theorem</strong> states that convolution in the spatial domain
-    corresponds to multiplication in the frequency (Fourier) domain:
-  </p>
-
-  <p><code>ℱ{f * h}(u, v) = F(u, v) &middot; H(u, v)</code></p>
-
-  <p>
-    Sketch of the derivation: take the Fourier transform of the convolution integral,
-    swap the order of integration, substitute x&prime; = x &minus; &tau;<sub>1</sub>,
-    y&prime; = y &minus; &tau;<sub>2</sub> in the inner integral, and the inner integral
-    reduces to H(u,v) times a phase factor depending only on (&tau;<sub>1</sub>,
-    &tau;<sub>2</sub>) &mdash; which can then be pulled outside, leaving exactly
-    F(u,v)&middot;H(u,v). Full step-by-step derivation, including the discrete case and
-    the zero-padding assumption needed to avoid circular-convolution wraparound
-    artifacts, is in
-    <a href="theory_convolution_theorem.md">theory_convolution_theorem.md</a>.
-  </p>
-
-  <p>
-    <strong>Experimental validation:</strong> across box and Gaussian filters at kernel
-    sizes 3, 5, 9, 15, and 21, the mean absolute difference between the spatial and
-    frequency-domain outputs was on the order of 10<sup>&minus;14</sup> &mdash; i.e.
-    floating-point rounding error, not a real discrepancy, exactly as the theorem
-    predicts. The in-browser demo above reports the same comparison live for whatever
-    image and kernel you try.
-  </p>
-
-  <h2>Demonstration Video</h2>
-  <div class="figure">
-    <video controls>
-      <source src="module3/videos/demo.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-      <a href="module3/videos/demo.mp4">Download the video</a> instead.
-    </video>
-    <div class="figure-caption">Screen recording of the working system (replace with your own file)</div>
   </div>
 
   <h2>Code</h2>
@@ -755,8 +719,9 @@
   const m3Result = document.getElementById("m3Result");
   const m3CanvasOriginal = document.getElementById("m3CanvasOriginal");
   const m3CanvasSpatial = document.getElementById("m3CanvasSpatial");
+  const m3CanvasSpecBefore = document.getElementById("m3CanvasSpecBefore");
+  const m3CanvasSpecAfter = document.getElementById("m3CanvasSpecAfter");
   const m3CanvasFrequency = document.getElementById("m3CanvasFrequency");
-  const m3CanvasDiff = document.getElementById("m3CanvasDiff");
 
   let m3GrayImage = null; // Float64Array, length H*W
   let m3H = 0, m3W = 0;
@@ -790,8 +755,9 @@
 
       m3DrawGray(m3CanvasOriginal, m3GrayImage, m3H, m3W);
       m3ClearCanvas(m3CanvasSpatial);
+      m3ClearCanvas(m3CanvasSpecBefore);
+      m3ClearCanvas(m3CanvasSpecAfter);
       m3ClearCanvas(m3CanvasFrequency);
-      m3ClearCanvas(m3CanvasDiff);
       m3Result.style.display = "none";
       m3SpatialResult = null;
       m3ApplyFrequencyButton.disabled = true;
@@ -941,6 +907,30 @@
 
   function m3NextPow2(n) { let p = 1; while (p < n) p <<= 1; return p; }
 
+  // Log-magnitude spectrum, fftshifted (DC moved to center, the conventional
+  // way to display a Fourier spectrum) and normalized to 0-255 for display.
+  function m3LogMagnitudeShifted(re, im, N) {
+    const mag = new Float64Array(N * N);
+    let maxVal = 0;
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const v = Math.log1p(Math.hypot(re[y][x], im[y][x]));
+        mag[y * N + x] = v;
+        if (v > maxVal) maxVal = v;
+      }
+    }
+    const half = N / 2;
+    const scale = maxVal > 0 ? 255 / maxVal : 0;
+    const out = new Float64Array(N * N);
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const sy = (y + half) % N, sx = (x + half) % N;
+        out[y * N + x] = mag[sy * N + sx] * scale;
+      }
+    }
+    return out;
+  }
+
   function m3FftConvolve2D(imgFlat, H, W, kernel2D, kh, kw) {
     const outH = H + kh - 1, outW = W + kw - 1;
     const N = Math.max(m3NextPow2(outH), m3NextPow2(outW));
@@ -965,6 +955,9 @@
     m3Fft2D(imgRe, imgIm, false);
     m3Fft2D(kerRe, kerIm, false);
 
+    // Spectrum of the image BEFORE smoothing (F(u,v), the forward FFT above)
+    const specBefore = m3LogMagnitudeShifted(imgRe, imgIm, N);
+
     const outRe = [], outIm = [];
     for (let y = 0; y < N; y++) {
       outRe.push(new Float64Array(N)); outIm.push(new Float64Array(N));
@@ -976,13 +969,20 @@
       }
     }
 
+    // Spectrum AFTER smoothing -- this is F(u,v)*H(u,v), still in the
+    // frequency domain, before the inverse transform. High-frequency energy
+    // should visibly shrink relative to specBefore -- that's the low-pass
+    // filtering, made visible in frequency space.
+    const specAfter = m3LogMagnitudeShifted(outRe, outIm, N);
+
     m3Fft2D(outRe, outIm, true);
 
     const result = new Float64Array(H * W);
     for (let y = 0; y < H; y++)
       for (let x = 0; x < W; x++)
         result[y * W + x] = outRe[y][x];
-    return result;
+
+    return { result, specBefore, specAfter, N };
   }
 
   // ---- UI actions ----
@@ -1008,8 +1008,9 @@
       m3UsedKernelSize = k;
 
       m3DrawGray(m3CanvasSpatial, result, m3H, m3W);
+      m3ClearCanvas(m3CanvasSpecBefore);
+      m3ClearCanvas(m3CanvasSpecAfter);
       m3ClearCanvas(m3CanvasFrequency);
-      m3ClearCanvas(m3CanvasDiff);
       m3Result.style.display = "none";
 
       m3Status.textContent =
@@ -1030,38 +1031,36 @@
     setTimeout(() => {
       const kernel = m3MakeKernel(m3UsedFilterType, m3UsedKernelSize);
       const t0 = performance.now();
-      const freqResult = m3FftConvolve2D(m3GrayImage, m3H, m3W, kernel, m3UsedKernelSize, m3UsedKernelSize);
+      const { result: freqResult, specBefore, specAfter, N } =
+        m3FftConvolve2D(m3GrayImage, m3H, m3W, kernel, m3UsedKernelSize, m3UsedKernelSize);
       const elapsed = performance.now() - t0;
 
+      m3DrawGray(m3CanvasSpecBefore, specBefore, N, N);
+      m3DrawGray(m3CanvasSpecAfter, specAfter, N, N);
       m3DrawGray(m3CanvasFrequency, freqResult, m3H, m3W);
 
-      // Compare against the spatial result
+      // Numeric comparison against the spatial result (still computed, just
+      // no longer shown as an image -- reported as text below instead).
       let maxDiff = 0, sumDiff = 0;
-      const diff = new Float64Array(m3H * m3W);
-      for (let i = 0; i < diff.length; i++) {
+      for (let i = 0; i < freqResult.length; i++) {
         const d = Math.abs(freqResult[i] - m3SpatialResult[i]);
-        diff[i] = d;
         if (d > maxDiff) maxDiff = d;
         sumDiff += d;
       }
-      const meanDiff = sumDiff / diff.length;
-
-      // Contrast-stretch the difference for visibility
-      const diffVis = new Float64Array(diff.length);
-      const scale = maxDiff > 0 ? 255 / maxDiff : 0;
-      for (let i = 0; i < diff.length; i++) diffVis[i] = diff[i] * scale;
-      m3DrawGray(m3CanvasDiff, diffVis, m3H, m3W);
+      const meanDiff = sumDiff / freqResult.length;
 
       m3Result.style.display = "block";
       m3Result.innerHTML =
         `<strong>${m3UsedFilterType} filter, k=${m3UsedKernelSize}:</strong><br>` +
         `Spatial time: ${m3SpatialTimeMs.toFixed(2)} ms &nbsp;|&nbsp; ` +
         `Frequency-domain time: ${elapsed.toFixed(2)} ms<br>` +
-        `Mean |difference|: ${meanDiff.toExponential(3)} &nbsp;|&nbsp; ` +
+        `Mean |difference| (spatial vs. inverse-FFT result): ${meanDiff.toExponential(3)} &nbsp;|&nbsp; ` +
         `Max |difference|: ${maxDiff.toExponential(3)}<br>` +
         `<small>Differences at this scale (~1e-10 or smaller) are floating-point rounding error, ` +
         `not a real discrepancy &mdash; confirming the two methods compute the same result, ` +
-        `exactly as the convolution theorem predicts.</small>`;
+        `exactly as the convolution theorem predicts. Compare the two FFT magnitude panels above: ` +
+        `smoothing removes high-frequency energy, visible as the "after" spectrum concentrating ` +
+        `more tightly around the center (low frequencies) than the "before" spectrum.</small>`;
 
       m3Status.textContent = "Comparison complete.";
       m3ApplyFrequencyButton.disabled = false;
