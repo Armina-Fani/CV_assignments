@@ -13,7 +13,7 @@
    visually that they produce the same result. 
 
  HOW TO USE:
-   python blur_fourier_equivalence.py --image path/to/photo.jpg --filter gaussian --kernel_sizes 3,5,9,15,21
+   python smoothing.py --image path/to/photo.jpg --filter gaussian --kernel_sizes 3,5,9,15,21
 
  OUTPUT:
    - comparison_kXX.png for each kernel size: original | spatial result |
