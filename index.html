@@ -1050,12 +1050,7 @@
         `Spatial time: ${m3SpatialTimeMs.toFixed(2)} ms &nbsp;|&nbsp; ` +
         `Frequency-domain time: ${elapsed.toFixed(2)} ms<br>` +
         `Mean |difference| (spatial vs. inverse-FFT result): ${meanDiff.toExponential(3)} &nbsp;|&nbsp; ` +
-        `Max |difference|: ${maxDiff.toExponential(3)}<br>` +
-        `<small>Differences at this scale (~1e-10 or smaller) are floating-point rounding error, ` +
-        `not a real discrepancy &mdash; confirming the two methods compute the same result, ` +
-        `exactly as the convolution theorem predicts. Compare the two FFT magnitude panels above: ` +
-        `smoothing removes high-frequency energy, visible as the "after" spectrum concentrating ` +
-        `more tightly around the center (low frequencies) than the "before" spectrum.</small>`;
+        `Max |difference|: ${maxDiff.toExponential(3)}<br>`;
 
       m3Status.textContent = "Comparison complete.";
       m3ApplyFrequencyButton.disabled = false;
