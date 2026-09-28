@@ -16,9 +16,9 @@ Every script has a README block at the top with full usage.
 
 ```bash
 
-python rgb_human_segmentation.py --image image --select
+python rgb_segmentation.py --image image --select
 
-python thermal_human_segmentation.py --image image
+python thermal_segmentation.py --image image
 
 ```
 
