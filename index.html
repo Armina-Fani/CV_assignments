@@ -549,17 +549,16 @@
   </p>
 
   <!-- ---------------- Part 1 ---------------- -->
-  <h2>Part 1: Human Boundary in a Colour (RGB) Image</h2>
+  <h2>Part 1: Human Boundary in an RGB Image</h2>
 
   <p>
-    A program with no learning cannot know what a &ldquo;human&rdquo; looks like, so the only
-    hint it gets is <em>where</em> each person roughly is: a box drawn around them. From that box:
+    This implementation assists the script by asking you to draw a box around the person you are trying to segment. From that box, the script does the following:
   </p>
   <ol>
     <li><strong>Smooth</strong> the photo with a bilateral filter (removes texture, keeps edges).</li>
     <li><strong>Seed</strong> two samples: the box's corners plus a ring around it (background), and the
       centre of the box (person).</li>
-    <li><strong>Count colours</strong> in each sample (Lab colour histograms) and a simple texture measure
+    <li><strong>Count colours</strong> in each sample and a simple texture measure
       (local brightness variation), then score every pixel with Bayes' rule:
       P(person&nbsp;|&nbsp;colour,&nbsp;texture).</li>
     <li><strong>Threshold</strong> at 0.5, clean up with morphology and hole filling, keep the blob on the seed.</li>
@@ -569,12 +568,6 @@
   </ol>
 
   <div class="application">
-    <div class="m4-samples">
-      Samples:
-      <button class="m4-sample" data-kind="rgb" data-src="module4/samples/rgb_astronaut.jpg">Astronaut</button>
-      <button class="m4-sample" data-kind="rgb" data-src="module4/samples/rgb_msrs00633D.jpg">Two walkers</button>
-      <button class="m4-sample" data-kind="rgb" data-src="module4/samples/rgb_msrs00537D.jpg">Two cyclists</button>
-    </div>
 
     <div class="controls">
       <div>
@@ -587,7 +580,7 @@
     </div>
 
     <div id="m4rgb_status" class="m4-status">Open this tab to load OpenCV.js, then upload an image.</div>
-    <div class="m4-legend">Drag a tight box around each person on the image below (optional &mdash;
+    <div class="m4-legend">Drag a tight box around each person on the image below (optional,
       without a box the whole image is used, which suits portraits on plain backgrounds).</div>
 
     <canvas id="m4rgb_canvasInput" class="m4-input-canvas" width="1" height="1"></canvas>
@@ -609,32 +602,18 @@
 
     <div id="m4rgb_result" class="m4-result"></div>
 
-    <h3>Compare with SAM2</h3>
-    <div class="controls">
-      <div>
-        <label for="m4rgb_sam2">SAM2 mask for the same image (white person on black, or transparent cut-out)</label>
-        <input id="m4rgb_sam2" type="file" accept="image/png,image/*" disabled>
-      </div>
-      <div>
-        <label><input id="m4rgb_invert" type="checkbox"> SAM2 mask has person in black</label>
-      </div>
-    </div>
-    <div id="m4rgb_metrics" class="m4-metrics">
-      <div class="canvas-grid">
-        <div class="canvas-cell">
-          <canvas id="m4rgb_canvasAgree"></canvas>
-          <div class="cell-label">green = both, red = ours only, blue = SAM2 only</div>
-        </div>
-        <div><table id="m4rgb_metricsTable"></table></div>
-      </div>
+  <div class="figure">
+    <img src="module4/rgb_output/rgb_steps.png" alt="RGB pipeline steps">
+    <div class="figure-caption">
+      Fig. 1 Offline result of <code>rgb_segmentation.py</code>: input and box, seeds,
+      person-probability map, mask after re-estimation, watershed markers, final boundary.
     </div>
   </div>
 
   <div class="figure">
-    <img src="module4/rgb_output/rgb_astronaut_steps.png" alt="RGB pipeline steps on the astronaut image">
+    <img src="module4/SAM_outputs/rgb_SAM2.png" alt="SAM2">
     <div class="figure-caption">
-      Fig. 1 &mdash; Offline result of <code>rgb_human_segmentation.py</code>: input and box, seeds,
-      person-probability map, mask after re-estimation, watershed markers, final boundary.
+      Fig. 2 Offline result of SAM2 segmentation.
     </div>
   </div>
 
@@ -643,7 +622,7 @@
 
   <p>
     In a thermal image brightness is temperature, and people are usually warmer than their
-    surroundings. No box is needed:
+    surroundings. So, no box is uses (although poor results indicate it would be worth it to use):
   </p>
   <ol>
     <li><strong>Denoise</strong> with a median filter (thermal sensors are speckly).</li>
@@ -658,13 +637,6 @@
   </ol>
 
   <div class="application">
-    <div class="m4-samples">
-      Samples:
-      <button class="m4-sample" data-kind="thermal" data-src="module4/samples/thermal_tno11.png">Trench</button>
-      <button class="m4-sample" data-kind="thermal" data-src="module4/samples/thermal_tno27.png">Umbrella</button>
-      <button class="m4-sample" data-kind="thermal" data-src="module4/samples/thermal_msrs00633D.png">Two walkers</button>
-      <button class="m4-sample" data-kind="thermal" data-src="module4/samples/thermal_msrs00537D.png">Two cyclists</button>
-    </div>
 
     <div class="controls">
       <div>
@@ -717,122 +689,20 @@
 
     <div id="m4thermal_result" class="m4-result"></div>
 
-    <h3>Compare with SAM2</h3>
-    <div class="controls">
-      <div>
-        <label for="m4thermal_sam2">SAM2 mask for the same image (white person on black, or transparent cut-out)</label>
-        <input id="m4thermal_sam2" type="file" accept="image/png,image/*" disabled>
-      </div>
-      <div>
-        <label><input id="m4thermal_invert" type="checkbox"> SAM2 mask has person in black</label>
-      </div>
-    </div>
-    <div id="m4thermal_metrics" class="m4-metrics">
-      <div class="canvas-grid">
-        <div class="canvas-cell">
-          <canvas id="m4thermal_canvasAgree"></canvas>
-          <div class="cell-label">green = both, red = ours only, blue = SAM2 only</div>
-        </div>
-        <div><table id="m4thermal_metricsTable"></table></div>
-      </div>
-    </div>
-  </div>
-
   <div class="figure">
-    <img src="module4/thermal_output/thermal_tno11_steps.png" alt="Thermal pipeline steps">
+    <img src="module4/thermal_output/thermal_steps.png" alt="Thermal pipeline steps">
     <div class="figure-caption">
-      Fig. 2 &mdash; Offline result of <code>thermal_human_segmentation.py</code>: input, background
+      Fig. 3 Offline result of <code>thermal_segmentation.py</code>: input, background
       estimate, top-hat, hysteresis mask, watershed markers, final boundary. The warm trench walls
       are fused with the person after the first threshold and are removed by re-thresholding and
       the relative-warmth test.
     </div>
   </div>
 
-  <!-- ---------------- SAM2 comparison ---------------- -->
-  <h2>Comparison with SAM2</h2>
-
-  <p>
-    SAM2 is prompted with one box per person (by default, the boxes around the people our
-    classical method found), so both methods get the same &ldquo;where&rdquo; hint.
-    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/compare_with_sam2.py">compare_with_sam2.py</a>
-    then reports, with SAM2 as the reference: <strong>IoU</strong> and <strong>Dice</strong> (overlap),
-    <strong>precision</strong> and <strong>recall</strong>, <strong>boundary F1</strong> (share of outline
-    pixels within 2&nbsp;px of the other outline &mdash; the best measure of an <em>exact</em> boundary),
-    <strong>ASSD</strong> (average outline distance) and <strong>HD95</strong> (worst-case outline
-    distance). You can also upload a SAM2 mask in either demo above to compute the same metrics.
-  </p>
-
-  <!-- Fill in from module4/comparison_output/metrics.csv after running compare_with_sam2.py -->
-  <div class="m4-scroll">
-  <table>
-    <tr><th>Image</th><th>Type</th><th>IoU</th><th>Dice</th><th>Boundary F1 @2px</th><th>ASSD (px)</th><th>HD95 (px)</th></tr>
-    <tr><td>rgb_astronaut</td><td>RGB</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr><td>rgb_msrs00633D</td><td>RGB</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr><td>thermal_tno11</td><td>Thermal</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr><td>thermal_msrs00633D</td><td>Thermal</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-  </table>
-  </div>
-
-  <!-- ---------------- Part 3 theory ---------------- -->
-  <h2>Part 3: Edges and Regions in the Fourier (Frequency) Domain</h2>
-
-  <div class="m4-theory">
-    <p>
-      Full derivation with a worked example by hand:
-      <a href="module4/theory/module4_theory.pdf">module4_theory.pdf</a>.
-      Figures are produced by
-      <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/fourier_demo.py">fourier_demo.py</a>.
-    </p>
-
-    <p>
-      <strong>The idea.</strong> Any image is a sum of 2-D waves (stripes). The Fourier transform
-      measures how much of each wave the image contains:
-    </p>
-    <div class="math-block">
-      \[ F(u,v)=\sum_{x}\sum_{y} f(x,y)\,e^{-j2\pi\left(\frac{ux}{M}+\frac{vy}{N}\right)} \]
-    </div>
-    <p>
-      Flat areas (the insides of regions) are made of slow waves &mdash; low frequencies near the centre
-      of the spectrum. Sudden jumps (edges) need fast waves &mdash; high frequencies. Filtering is a
-      multiplication in this domain (the convolution theorem, \( f*h \Leftrightarrow F\cdot H \)), so
-      the frequency response \(H(u,v)\) acts as a volume knob for every wave.
-    </p>
-
-    <p>
-      <strong>Edges = high frequencies.</strong> Differentiating the inverse transform gives
-    </p>
-    <div class="math-block">
-      \[ \mathcal{F}\!\left\{\tfrac{\partial f}{\partial x}\right\}=j2\pi u\,F(u,v),\qquad
-         \mathcal{F}\{\nabla^2 f\}=-4\pi^2\left(u^2+v^2\right)F(u,v), \]
-    </div>
-    <p>
-      so a derivative is a high-pass filter: zero gain for the flat part, growing gain for fast waves.
-      Because noise is also fast, it is multiplied by a Gaussian (whose transform is again a Gaussian,
-      \( e^{-2\pi^2\sigma^2(u^2+v^2)} \)), giving the Laplacian-of-Gaussian band-pass
-      \( H_{\text{LoG}}=-4\pi^2\rho^2 e^{-2\pi^2\sigma^2\rho^2} \). Edges are where the gradient
-      magnitude is large or where the LoG output changes sign (zero crossings).
-    </p>
-    <div class="figure">
-      <img src="module4/theory/fig3_edges.png" alt="Frequency-domain edge detection">
-      <div class="figure-caption">Fig. 3 &mdash; Edge detection done only by multiplying the spectrum:
-        \(\partial f/\partial x\), gradient magnitude, threshold, LoG response, LoG zero crossings.</div>
-    </div>
-
-    <p>
-      <strong>Regions = low (or band-limited) frequencies.</strong> Inside a region the brightness is
-      nearly constant, so a Gaussian low-pass \( H=e^{-D^2/2D_0^2} \) removes noise while keeping each
-      region's level; a band-pass (low-pass minus a much wider low-pass) also removes slow background
-      changes. One threshold (Otsu) then separates the regions. For regions that differ by
-      <em>texture</em>, Gabor band-pass filters (Gaussian bumps centred at \(\pm(u_k,v_k)\)) measure the
-      local energy of each stripe frequency and direction; each pixel joins the band that is strongest there.
-    </p>
-    <div class="figure">
-      <img src="module4/theory/fig4_regions.png" alt="Frequency-domain region segmentation">
-      <div class="figure-caption">Fig. 4 &mdash; Brightness regions in a thermal image via low-/band-pass filtering and Otsu.</div>
-    </div>
-    <div class="figure">
-      <img src="module4/theory/fig5_texture_regions.png" alt="Gabor texture segmentation">
-      <div class="figure-caption">Fig. 5 &mdash; Texture regions from three Gabor band-pass filters (99.3% of pixels correctly labelled).</div>
+  <div class="figure">
+    <img src="module4/SAM_outputs/theral_SAM2.png" alt="SAM2">
+    <div class="figure-caption">
+      Fig. 4 Offline result of SAM2 segmentation after several iterations of clicks.
     </div>
   </div>
 
@@ -840,19 +710,10 @@
   <div class="m4-scroll">
   <table>
     <tr><th>Script</th><th>What it does</th></tr>
-    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/rgb_human_segmentation.py">rgb_human_segmentation.py</a></td><td>Part 1 &mdash; RGB boundary (classical)</td></tr>
-    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/thermal_human_segmentation.py">thermal_human_segmentation.py</a></td><td>Part 2 &mdash; thermal boundary (classical)</td></tr>
-    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/compare_with_sam2.py">compare_with_sam2.py</a></td><td>Runs / loads SAM2 and computes the comparison metrics</td></tr>
-    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/fourier_demo.py">fourier_demo.py</a></td><td>Part 3 &mdash; frequency-domain edges &amp; regions figures</td></tr>
-    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/module4.js">module4.js</a></td><td>This page's browser version of Parts 1&ndash;2</td></tr>
+    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/rgb_segmentation.py">rgb_segmentation.py</a></td><td>Part 1, RGB boundary (classical)</td></tr>
+    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/thermal_segmentation.py">thermal_segmentation.py</a></td><td>Part 2, thermal boundary (classical)</td></tr>
   </table>
   </div>
-
-  <p>
-    Demonstration video:
-    <!-- replace # with the YouTube link -->
-    <a href="#">[add YouTube link]</a>
-  </p>
 
 </div>
 
