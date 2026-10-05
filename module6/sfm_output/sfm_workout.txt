@@ -1,0 +1,116 @@
+STEP 1 - Camera parameters (Module 2 calibration)
+  image size: 960 x 1280 px
+  K rescaled from 4284x5712 to 960x1280 (factor 0.2241).
+  K =
+[[990.8    0.   486.13]
+ [  0.   993.21 624.47]
+ [  0.     0.     1.  ]]
+  fx = 990.80, fy = 993.21, cx = 486.13, cy = 624.47 (px)
+  horizontal field of view = 51.7 deg
+  distortion (k1,k2,p1,p2,k3) = [ 0.20644 -0.89949 -0.00595 -0.0002   0.95645]
+
+STEP 2-3 - Feature matching and homographies  x_k ~ H_1k x_1  (undistorted pixels)
+  view 1 -> view 2: 1143 matches, 1055 RANSAC inliers, mean transfer error 0.56 px
+  H_12 =
+[[  0.823233  -0.27564  160.791418]
+ [  0.084764   0.655896  -4.713873]
+ [ -0.000086  -0.000221   1.      ]]
+  view 1 -> view 3: 710 matches, 588 RANSAC inliers, mean transfer error 0.84 px
+  H_13 =
+[[  0.417287   0.141937 -34.176913]
+ [ -0.506703   0.8299   194.941804]
+ [ -0.000488  -0.000002   1.      ]]
+  view 1 -> view 4: 1194 matches, 1110 RANSAC inliers, mean transfer error 0.57 px
+  H_14 =
+[[   1.762128    0.141409 -170.811718]
+ [   0.341999    2.119496 -583.279701]
+ [   0.000159    0.000879    1.      ]]
+
+STEP 4 - Decompose H_1k = K (R + t n^T / d) K^-1 into rotation, translation/d, plane normal
+  view 2: 4 solutions, 1 put the points in front of both cameras
+  view 3: 4 solutions, 1 put the points in front of both cameras
+  view 4: 4 solutions, 1 put the points in front of both cameras
+  chosen solution for view 2:
+    R_12 =
+[[ 0.98205 -0.18123  0.05227]
+ [ 0.16223  0.95297  0.256  ]
+ [-0.09621 -0.24292  0.96526]]
+    rotation angles (x, y, z) = [-14.13   5.52   9.38] deg, total 18.17 deg
+    t / d = [-0.06445 -0.33581 -0.0355 ]
+    n     = [0.01636 0.1577  0.98735]
+  chosen solution for view 3:
+    R_13 =
+[[ 0.78385  0.28256  0.55293]
+ [-0.24015  0.95912 -0.1497 ]
+ [-0.57263 -0.01545  0.81967]]
+    rotation angles (x, y, z) = [ -1.08  34.93 -17.03] deg, total 38.62 deg
+    t / d = [-0.69695  0.14123  0.08138]
+    n     = [0.01489 0.16263 0.98658]
+  chosen solution for view 4:
+    R_14 =
+[[ 0.98583 -0.16751 -0.00874]
+ [ 0.14017  0.85136 -0.50551]
+ [ 0.09212  0.49713  0.86277]]
+    rotation angles (x, y, z) = [29.95 -5.29  8.09] deg, total 31.79 deg
+    t / d = [-0.00099  0.44646  0.08993]
+    n     = [0.00308 0.15183 0.9884 ]
+  plane normals agree to within 0.58 deg; mean n = [0.01144 0.15739 0.98747]
+
+STEP 5 - Metric scale and camera positions (camera-1 coordinate frame)
+  measured distance camera 1 -> object centre D = 340.0 mm -> perpendicular distance to the plane d = 338.3 mm
+  view      centre X          Y          Z   dist. to cam 1   angle of view axis to plane normal
+  view 1         0.0        0.0        0.0          0.0 mm        9.1 deg
+  view 2        38.7      101.4       41.8        116.3 mm       24.0 deg
+  view 3       212.1       21.2      115.0        242.1 mm       36.8 deg
+  view 4       -23.6     -143.8       50.1        154.1 mm       21.4 deg
+  P_1 = K [R_1 | t_1] =
+[[990.8    0.   486.13   0.  ]
+ [  0.   993.21 624.47   0.  ]
+ [  0.     0.     1.     0.  ]]
+  P_2 = K [R_2 | t_2] =
+[[    926.24    -297.65     521.03  -27441.06]
+ [    101.05     794.8      857.04 -120336.06]
+ [     -0.1       -0.24       0.97     -12.01]]
+  P_3 = K [R_3 | t_3] =
+[[    498.27     272.46     946.3  -220228.98]
+ [   -596.11     942.97     363.18   64647.05]
+ [     -0.57      -0.02       0.82      27.53]]
+  P_4 = K [R_4 | t_4] =
+[[  1021.54     75.7     410.75  14457.79]
+ [   196.75   1156.02     36.7  169012.96]
+ [     0.09      0.5       0.86     30.42]]
+
+STEP 6 - Triangulation (linear DLT, 4 views)
+  feature points seen in all 4 views: 246
+  reprojection error: mean 0.40 px, 95th pct 0.97 px
+  plane fitted to them: normal [0.0112 0.1594 0.9871], RMS distance from plane 0.31 mm  (flatness check)
+
+STEP 7 - Object boundary (corners clicked in view 1, transferred with H_1k, triangulated)
+  worked example, corner 1:
+    image positions (undistorted px): v1=(434.8, 293.1), v2=(487.8, 249.9), v3=(239.9, 276.7), v4=(480.0, 140.7)
+    DLT system A X = 0 (rows x*p3 - p1, y*p3 - p2 for each view):
+[[   -990.8       0.      -51.3       0. ]
+ [      0.     -993.2    -331.4       0. ]
+ [   -973.2     179.2     -50.2   21582.4]
+ [   -125.1    -855.5    -615.8  117334.4]
+ [   -635.7    -276.2    -749.6  226834.5]
+ [    437.6    -947.2    -136.3  -57027.7]
+ [   -977.3     162.9       3.3     144.8]
+ [   -183.8   -1086.1      84.7 -164732.7]]
+    smallest singular vector -> X = [ -18.6  -120.68  362.32] mm
+    reprojection: v1 0.70px, v2 0.66px, v3 1.34px, v4 1.61px
+  3-D corners (camera-1 frame):
+    corner 1: [ -18.6 -120.7  362.3] mm
+    corner 2: [121.8 -58.  350.6] mm
+    corner 3: [ 21.7 150.4 318.2] mm
+    corner 4: [-115.9   86.1  330.2] mm
+  boundary in plane coordinates (origin = corner 1, x along side 1-2):
+    corner 1: (0.0, 0.0) mm
+    corner 2: (154.2, 0.0) mm
+    corner 3: (150.3, 233.4) mm
+    corner 4: (-2.1, 230.7) mm
+  side lengths: 1-2: 154.2, 2-3: 233.5, 3-4: 152.4, 4-1: 230.8 mm
+  corner angles: 90.5, 89.0, 90.0, 90.5 deg
+  area: 35585 mm^2
+  true size 152.0 x 242.0 mm -> estimated 153.3 x 232.1 mm (errors +0.9%, -4.1%)
+

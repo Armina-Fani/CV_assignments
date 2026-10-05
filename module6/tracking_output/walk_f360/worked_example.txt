@@ -1,0 +1,28 @@
+Video walk.mp4, frames 360 -> 361, image 640x1138
+Window 21x21, 3 pyramid levels, central-difference gradients
+
+Point #6: start (x, y) = (408.00, 508.00)
+Lucas-Kanade system at full resolution, first Newton step
+  starting guess from coarser levels (u, v) = (1.445, 0.093)
+  A = [[192605.2, 12943.2], [12943.2, 194231.5]]
+  b = -[sum IxIt, sum IyIt] = [7887.6, -417.0]
+  det A = 37242478894.8,  eigenvalues = [180449.6, 206387.1]
+  update d = A^-1 b = (0.0413, -0.0049)
+  iterations at full resolution (k, u, v, |step|):
+    0: u=1.4859, v=0.0886, |d|=0.0416
+    1: u=1.4811, v=0.0895, |d|=0.0049
+  final flow (u, v) = (1.481, 0.089)
+  predicted position = (409.481, 508.089)
+  actual position    = (409.500, 508.110)  (NCC score 0.978)
+  error              = 0.028 px
+
+Bilinear interpolation of frame 2 at the predicted position:
+  j = floor(x) = 409, i = floor(y) = 508, a = 0.4811, b = 0.0895
+  I[i,j] = 68, I[i,j+1] = 70, I[i+1,j] = 58, I[i+1,j+1] = 53
+  I(x,y) = (1-a)(1-b)68 + a(1-b)70 + (1-a)b58 + ab53 = 67.766
+
+Summary over all valid points (NCC score > 0.9, well-conditioned window):
+  points used: 27 / 27
+  mean displacement: 1.38 px
+  our LK error vs actual:    mean 0.082 px, median 0.078 px, max 0.151 px
+  OpenCV LK error vs actual: mean 0.082 px, median 0.078 px

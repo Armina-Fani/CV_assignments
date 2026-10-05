@@ -1,0 +1,30 @@
+Video bottle.mp4, frames 360 -> 361, image 640x1138
+Window 21x21, 3 pyramid levels, central-difference gradients
+
+Point #6: start (x, y) = (313.00, 673.00)
+Lucas-Kanade system at full resolution, first Newton step
+  starting guess from coarser levels (u, v) = (-0.432, -0.308)
+  A = [[184151.0, 525.8], [525.8, 125237.2]]
+  b = -[sum IxIt, sum IyIt] = [-28630.2, -20164.8]
+  det A = 23062288411.7,  eigenvalues = [125232.6, 184155.7]
+  update d = A^-1 b = (-0.1550, -0.1604)
+  iterations at full resolution (k, u, v, |step|):
+    0: u=-0.5870, v=-0.4684, |d|=0.2230
+    1: u=-0.5524, v=-0.4369, |d|=0.0468
+    2: u=-0.5601, v=-0.4433, |d|=0.0100
+    3: u=-0.5584, v=-0.4420, |d|=0.0022
+  final flow (u, v) = (-0.558, -0.442)
+  predicted position = (312.442, 672.558)
+  actual position    = (312.412, 672.587)  (NCC score 0.813)
+  error              = 0.042 px
+
+Bilinear interpolation of frame 2 at the predicted position:
+  j = floor(x) = 312, i = floor(y) = 672, a = 0.4416, b = 0.5580
+  I[i,j] = 188, I[i,j+1] = 183, I[i+1,j] = 188, I[i+1,j+1] = 189
+  I(x,y) = (1-a)(1-b)188 + a(1-b)183 + (1-a)b188 + ab189 = 187.271
+
+Summary over all valid points (NCC score > 0.9, well-conditioned window):
+  points used: 25 / 29
+  mean displacement: 0.50 px
+  our LK error vs actual:    mean 0.089 px, median 0.047 px, max 0.324 px
+  OpenCV LK error vs actual: mean 0.090 px, median 0.049 px

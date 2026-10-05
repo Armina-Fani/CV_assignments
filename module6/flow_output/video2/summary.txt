@@ -1,0 +1,7 @@
+Video: bottle.mp4
+Clip: 900 frames, 30.0 s at 30.0 fps, processed at 640x1138
+Average speed of the moving pixels: 116.7 px/s (busiest moment at 15.1 s)
+Average share of the frame that moves: 17.1%
+Camera pan speed: median 19.8 px/s (camera is moving); zoom changes by up to 33.9%/s, rotation up to 11.6 deg/s
+Frames with at least one independently moving object: 97%
+Average number of moving objects per frame: 2.7
