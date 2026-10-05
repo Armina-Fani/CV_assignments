@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armina Fani's Computer Vision Assignments</title>
+
+<style>
+  body {
+    background: #fff;
+    color: #1a3fa0;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 900px;
+    margin: auto;
+    padding: 24px;
+    line-height: 1.5;
+  }
+
+  h1 { font-size: 26px; margin-bottom: 4px; }
+  h2 {
+    font-size: 20px;
+    border-bottom: 1px solid #c9d6f2;
+    padding-bottom: 4px;
+    margin-top: 30px;
+  }
+
+  a { color: #1a3fa0; }
+
+  .tabs {
+    margin-top: 20px;
+    border-bottom: 2px solid #c9d6f2;
+  }
+
+  .tab-button {
+    background: none;
+    border: none;
+    color: #1a3fa0;
+    font-size: 16px;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+
+  .tab-button.active {
+    font-weight: bold;
+    border-bottom: 3px solid #1a3fa0;
+  }
+
+  .tab-content { display: none; padding-top: 20px; }
+  .tab-content.active { display: block; }
+
+  table {
+    border-collapse: collapse;
+    margin: 10px 0;
+    max-width: 100%;
+  }
+
+  td, th {
+    border: 1px solid #c9d6f2;
+    padding: 6px 12px;
+    text-align: left;
+  }
+
+  img, video {
+    max-width: 100%;
+    border: 1px solid #c9d6f2;
+  }
+
+  .figure { margin: 16px 0; }
+
+  .figure-caption {
+    font-size: 14px;
+    color: #4a6bb5;
+  }
+
+  .application {
+    background: #f5f8ff;
+    border: 1px solid #c9d6f2;
+    border-radius: 8px;
+    padding: 18px;
+    margin: 18px 0;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  input {
+    padding: 8px;
+    border: 1px solid #9eb1dc;
+    border-radius: 4px;
+  }
+
+  button.action {
+    background: #1a3fa0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 14px;
+    cursor: pointer;
+  }
+
+  button.action:disabled {
+    background: #8795b7;
+    cursor: not-allowed;
+  }
+
+  #imageCanvas {
+    display: none;
+    width: 100%;
+    height: auto;
+    cursor: crosshair;
+    border: 1px solid #9eb1dc;
+    margin-top: 12px;
+  }
+
+  #instructions {
+    font-weight: bold;
+  }
+
+  #measurementResult {
+    display: none;
+    background: white;
+    border-left: 5px solid #1a3fa0;
+    padding: 12px;
+    margin-top: 14px;
+    font-size: 18px;
+  }
+
+  .warning {
+    display: none;
+    color: #8a3b00;
+    background: #fff3df;
+    padding: 8px;
+    margin-top: 10px;
+  }
+
+  /* Module 3 */
+  select {
+    padding: 8px;
+    border: 1px solid #9eb1dc;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+
+  .canvas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .canvas-cell { text-align: center; }
+
+  .canvas-cell canvas {
+    width: 100%;
+    height: auto;
+    border: 1px solid #9eb1dc;
+    background: #eee;
+  }
+
+  .canvas-cell .cell-label {
+    font-size: 13px;
+    color: #4a6bb5;
+    margin-top: 4px;
+  }
+
+  .m3-result {
+    display: none;
+    background: white;
+    border-left: 5px solid #1a3fa0;
+    padding: 12px;
+    margin-top: 14px;
+    font-size: 15px;
+  }
+
+  .m3-status {
+    font-style: italic;
+    color: #4a6bb5;
+  }
+
+  /* Module 4 */
+  .m4-input-canvas {
+    width: 100%;
+    height: auto;
+    border: 1px solid #9eb1dc;
+    margin-top: 12px;
+    background: #eee;
+    touch-action: none;
+  }
+
+  #m4rgb_canvasInput { cursor: crosshair; }
+
+  .m4-status {
+    font-style: italic;
+    color: #4a6bb5;
+  }
+
+  .m4-result, .m4-metrics {
+    display: none;
+    background: white;
+    border-left: 5px solid #1a3fa0;
+    padding: 12px;
+    margin-top: 14px;
+    font-size: 15px;
+  }
+
+  .m4-samples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  button.m4-sample {
+    background: white;
+    color: #1a3fa0;
+    border: 1px solid #9eb1dc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .m4-legend { font-size: 13px; color: #4a6bb5; }
+
+  .m4-theory .math-block, .m4-scroll { overflow-x: auto; }
+
+  .m4-note {
+    background: #f5f8ff;
+    border-left: 4px solid #9eb1dc;
+    padding: 8px 12px;
+    margin: 12px 0;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Armina Fani's Computer Vision Assignments</h1>
+<div>CSc 8830 &mdash; Computer Vision</div>
+
+<div class="tabs">
+  <button class="tab-button active"
+          onclick="showTab('module2', this)">Module 2</button>
+  <button class="tab-button"
+          onclick="showTab('module3', this)">Module 3</button>
+  <button class="tab-button"
+          onclick="showTab('module4', this)">Module 4</button>
+  <button class="tab-button"
+          onclick="showTab('module6', this)">Module 6</button>
+</div>
+
+<div id="module2" class="tab-content active">
+
+  <h2>Module 2: Camera Calibration &amp; Perspective Projection</h2>
+
+  <p>
+    GitHub repository:
+    <a href="https://github.com/Armina-Fani/CV_assignments">
+      CV_assignments
+    </a>
+  </p>
+
+  <h2>Step 1: Camera Calibration</h2>
+
+  <p>
+    I calibrated a smartphone camera using OpenCV's
+    <code>calibrateCamera</code> with 23 photographs of a printed 9 × 6
+    chessboard taken at different positions, distances, and orientations.
+  </p>
+
+  <table>
+    <tr><th>Image size</th><td>4284 × 5712 px</td></tr>
+    <tr><th>fx, fy</th><td>4421.4254, 4432.1984 px</td></tr>
+    <tr><th>cx, cy</th><td>2169.3365, 2786.7045 px</td></tr>
+    <tr>
+      <th>Distortion coefficients</th>
+      <td>0.206442444, −0.899492530, −0.005947129, −0.000197481, 0.956453360</td>
+    </tr>
+    <tr><th>Mean reprojection error</th><td>1.1332 px</td></tr>
+  </table>
+
+  <div class="figure">
+    <img src="module2/calibrationImages/IMG_5508 Medium.jpeg"
+         alt="Chessboard calibration photograph">
+    <div class="figure-caption">
+      Fig. 1 — Sample chessboard calibration photograph
+    </div>
+  </div>
+
+  <p>
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/calibrationImages">
+      View calibration images
+    </a>
+    |
+    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module2/calibration_report.txt">
+      View calibration report
+    </a>
+  </p>
+
+  <h2>Step 2: Interactive Object Measurement</h2>
+
+  <p>
+    This browser application implements the same perspective-projection
+    equations as <code>measureObject.py</code>. Both selected endpoints are
+    assumed to lie at the entered depth from the camera.
+  </p>
+
+  <div class="application">
+
+    <div class="controls">
+      <div>
+        <label for="imageInput">Object image</label>
+        <input id="imageInput" type="file" accept="image/*">
+      </div>
+
+      <div>
+        <label for="distanceInput">Camera distance Z (mm)</label>
+        <input id="distanceInput"
+               type="number"
+               min="1"
+               step="0.1"
+               value="2103">
+      </div>
+
+      <button class="action" onclick="resetPoints()">
+        Reset points
+      </button>
+
+      <button id="downloadButton"
+              class="action"
+              onclick="downloadResult()"
+              disabled>
+        Download result
+      </button>
+    </div>
+
+    <div id="instructions">
+      Upload an image, then click the two endpoints of the dimension being
+      measured.
+    </div>
+
+    <div id="dimensionWarning" class="warning"></div>
+
+    <canvas id="imageCanvas"></canvas>
+
+    <div id="measurementResult"></div>
+  </div>
+
+  <p>
+    The computation is:
+  </p>
+
+  <p>
+    <code>X = (u − cx)Z/fx</code>,
+    <code>Y = (v − cy)Z/fy</code>, and
+    <code>D = √[(X₂ − X₁)² + (Y₂ − Y₁)²]</code>.
+  </p>
+
+  <h2>Step 3: Experimental Validation</h2>
+
+  <p>
+    Twenty objects were photographed from a measured camera-to-object
+    distance of 2103 mm. Their dimensions were estimated using perspective
+    projection and compared with their known dimensions.
+  </p>
+
+  <div class="figure">
+    <img src="module2/objects/animal Large.jpeg"
+         alt="Example validation object">
+    <div class="figure-caption">
+      Fig. 2 — Example object photographed from 2103 mm
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="module2/objects/measuredImages/animal_measured Large.jpeg"
+         alt="Annotated measurement result">
+    <div class="figure-caption">
+      Fig. 3 — Measurement produced by the Python script
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Trials</th><td>20</td></tr>
+    <tr><th>Mean error</th><td>−6.6584 mm</td></tr>
+    <tr><th>Standard deviation</th><td>24.6300 mm</td></tr>
+    <tr><th>RMSE</th><td>25.5141 mm</td></tr>
+    <tr><th>Mean percentage error</th><td>6.8545%</td></tr>
+  </table>
+
+  <p>
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/objects">
+      Object images
+    </a>
+    |
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module2/objects/measuredImages">
+      Measured images
+    </a>
+    |
+    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module2/objects/validation_results.csv">
+      Validation results
+    </a>
+  </p>
+
+  <p>
+    Demonstration video:
+    <a href="https://youtu.be/fY_xEQqkIoM">Watch on YouTube</a>
+  </p>
+
+</div>
+
+<!-- ============ MODULE 3 ============ -->
+<div id="module3" class="tab-content">
+
+  <h2>Module 3: Image Blurring &mdash; Spatial vs. Frequency-Domain Filtering</h2>
+
+  <p>
+    GitHub repository:
+    <a href="https://github.com/Armina-Fani/CV_assignments">CV_assignments</a>
+    &mdash;
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module3">module3 folder</a>
+  </p>
+
+  <p>
+    Image blurring is implemented first through direct spatial
+    convolution with either a Gaussian or Box smoothing kernel, and second through the Fourier-domain
+    equivalent (multiply the image's FFT by the kernel's FFT, then
+    inverse-transform). The demo below runs both in the browser on your uploaded image, and reports the numerical difference between
+    them.
+  </p>
+
+  <div class="application">
+
+    <div class="controls">
+      <div>
+        <label for="blurImageInput">Image</label>
+        <input id="blurImageInput" type="file" accept="image/*">
+      </div>
+
+      <div>
+        <label for="filterTypeSelect">Filter type</label>
+        <select id="filterTypeSelect">
+          <option value="box">Box</option>
+          <option value="gaussian" selected>Gaussian</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="kernelSizeSelect">Kernel size</label>
+        <select id="kernelSizeSelect">
+          <option value="3">3 &times; 3</option>
+          <option value="5">5 &times; 5</option>
+          <option value="7">7 &times; 7</option>
+          <option value="9" selected>9 &times; 9</option>
+          <option value="11">11 &times; 11</option>
+          <option value="15">15 &times; 15</option>
+          <option value="21">21 &times; 21</option>
+        </select>
+      </div>
+
+      <button class="action" id="applySpatialButton" onclick="m3ApplySpatial()" disabled>
+        1. Apply spatial filter
+      </button>
+
+      <button class="action" id="applyFrequencyButton" onclick="m3ApplyFrequency()" disabled>
+        2. Compute Fourier equivalent
+      </button>
+    </div>
+
+    <div id="m3Status" class="m3-status">Upload an image to begin.</div>
+
+    <div class="canvas-grid">
+      <div class="canvas-cell">
+        <canvas id="m3CanvasOriginal"></canvas>
+        <div class="cell-label">Original (grayscale)</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasSpatial"></canvas>
+        <div class="cell-label">Spatial filter result</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasSpecBefore"></canvas>
+        <div class="cell-label">FFT magnitude before smoothing</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasSpecAfter"></canvas>
+        <div class="cell-label">FFT magnitude after smoothing in frequency domain</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m3CanvasFrequency"></canvas>
+        <div class="cell-label">Frequency smoothed result</div>
+      </div>
+    </div>
+
+    <div id="m3Result" class="m3-result"></div>
+  </div>
+
+  <p>
+    Processing is done in grayscale, resized to a maximum dimension of 380px for
+    responsive in-browser performance. The full-resolution offline version implementation script can be found here:
+    <a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module3/smoothing.py">smoothing.py</a>
+  </p>
+
+  <p>Example offline processing results with both a Gaussian and Box filter can be found below:</p>
+  <div class="figure">
+    <img src="module3/gaussianSmoothingExample.jpeg" alt="Side-by-side comparison of spatial and frequency-domain blur results">
+    <div class="figure-caption">
+      Fig. 1 &mdash; original image, spatial result, FFT magnitude before smoothing, FFT magnitude after smoothing, frequency smoothed result for Gaussian filter.
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="module3/boxSmoothingExample.jpeg" alt="Side-by-side comparison of spatial and frequency-domain blur results">
+    <div class="figure-caption">
+      Fig. 2 &mdash; original image, spatial result, FFT magnitude before smoothing, FFT magnitude after smoothing, frequency smoothed result for Box filter.
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ MODULE 4 ============ -->
+<div id="module4" class="tab-content">
+
+  <h2>Module 4: Finding the Exact Boundary of a Human &mdash; RGB &amp; Thermal Images</h2>
+
+  <p>
+    GitHub repository:
+    <a href="https://github.com/Armina-Fani/CV_assignments">CV_assignments</a>
+    &mdash;
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module4">module4 folder</a>
+  </p>
+
+  <p>
+    Both assignment parts outline people using classical image processing techniques
+    (OpenCV filtering, histograms, thresholding, morphology, watershed and contours). The results are visually compared with an online implemntation of Meta's
+    <a href="https://sam2-seven.vercel.app/">SAM2</a> segmentation. The demos below run the same algorithms as the Python scripts, directly
+    in the browser with OpenCV.js.
+  </p>
+
+  <!-- ---------------- Part 1 ---------------- -->
+  <h2>Part 1: Human Boundary in an RGB Image</h2>
+
+  <p>
+    This implementation assists the script by asking you to draw a box around the person you are trying to segment. From that box, the script does the following:
+  </p>
+  <ol>
+    <li><strong>Smooth</strong> the photo with a bilateral filter (removes texture, keeps edges).</li>
+    <li><strong>Seed</strong> two samples: the box's corners plus a ring around it (background), and the
+      centre of the box (person).</li>
+    <li><strong>Count colours</strong> in each sample and a simple texture measure
+      (local brightness variation), then score every pixel with Bayes' rule:
+      P(person&nbsp;|&nbsp;colour,&nbsp;texture).</li>
+    <li><strong>Threshold</strong> at 0.5, clean up with morphology and hole filling, keep the blob on the seed.</li>
+    <li><strong>Re-estimate</strong> the colour counts from that mask and repeat three times.</li>
+    <li><strong>Snap the outline</strong> to the strongest nearby edge with marker-based watershed, then
+      trace every boundary pixel with <code>findContours</code>.</li>
+  </ol>
+
+  <div class="application">
+
+    <div class="controls">
+      <div>
+        <label for="m4rgb_file">Colour image</label>
+        <input id="m4rgb_file" type="file" accept="image/*">
+      </div>
+      <button class="action" id="m4rgb_clear">Clear boxes</button>
+      <button class="action" id="m4rgb_run" disabled>Find boundary</button>
+      <button class="action" id="m4rgb_download" disabled>Download mask</button>
+    </div>
+
+    <div id="m4rgb_status" class="m4-status">Open this tab to load OpenCV.js, then upload an image.</div>
+    <div class="m4-legend">Drag a tight box around each person on the image below (optional,
+      without a box the whole image is used, which suits portraits on plain backgrounds).</div>
+
+    <canvas id="m4rgb_canvasInput" class="m4-input-canvas" width="1" height="1"></canvas>
+
+    <div class="canvas-grid">
+      <div class="canvas-cell">
+        <canvas id="m4rgb_canvasA"></canvas>
+        <div class="cell-label">Seeds: person (green) / background (red)</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m4rgb_canvasB"></canvas>
+        <div class="cell-label">P(person | colour, texture) after re-estimation</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m4rgb_canvasFinal"></canvas>
+        <div class="cell-label">Final exact boundary</div>
+      </div>
+    </div>
+
+    <div id="m4rgb_result" class="m4-result"></div>
+  </div>
+
+  <div class="figure">
+    <img src="module4/rgb_output/rgb_steps.png" alt="RGB pipeline steps">
+    <div class="figure-caption">
+      Fig. 1 Offline result of <code>rgb_segmentation.py</code>: input and box, seeds,
+      person-probability map, mask after re-estimation, watershed markers, final boundary.
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="module4/SAM_outputs/rgb_SAM2.png" alt="SAM2">
+    <div class="figure-caption">
+      Fig. 2 Offline result of SAM2 segmentation.
+    </div>
+  </div>
+
+  <!-- ---------------- Part 2 ---------------- -->
+  <h2>Part 2: Human Boundary in a Thermal Image</h2>
+
+  <p>
+    In a thermal image brightness is temperature, and people are usually warmer than their
+    surroundings. So, no box is uses (although poor results indicate it would be worth it to use):
+  </p>
+  <ol>
+    <li><strong>Denoise</strong> with a median filter (thermal sensors are speckly).</li>
+    <li><strong>Remove the background</strong> with a white top-hat: an opening with a large disk keeps only
+      warm structures wider than the disk (sky, walls, road); subtracting it leaves narrow warm objects.</li>
+    <li><strong>Hysteresis threshold</strong>: high = Otsu level, low = half of it; weak pixels survive only
+      if they touch strong ones, so cooler limbs attached to a warm torso are kept.</li>
+    <li><strong>Filter blobs</strong> by size, compactness and upright shape. A blob that fails because a
+      person is fused with a warm wall is re-thresholded with its own (higher) Otsu level and re-tested.
+      Blobs much cooler than the warmest one are dropped.</li>
+    <li><strong>Snap the outline</strong> with watershed and trace it with <code>findContours</code>.</li>
+  </ol>
+
+  <div class="application">
+
+    <div class="controls">
+      <div>
+        <label for="m4thermal_file">Thermal image</label>
+        <input id="m4thermal_file" type="file" accept="image/*">
+      </div>
+      <div>
+        <label for="m4thermal_relheat">Min. relative warmth</label>
+        <select id="m4thermal_relheat">
+          <option value="0.6">0.6</option>
+          <option value="0.7">0.7</option>
+          <option value="0.8" selected>0.8</option>
+          <option value="0.9">0.9</option>
+        </select>
+      </div>
+      <div>
+        <label for="m4thermal_tophat">Background disk</label>
+        <select id="m4thermal_tophat">
+          <option value="0.2">20% of short side</option>
+          <option value="0.3" selected>30% of short side</option>
+          <option value="0.45">45% (close-up people)</option>
+        </select>
+      </div>
+      <div>
+        <label><input id="m4thermal_blackhot" type="checkbox"> Black-hot palette</label>
+        <label><input id="m4thermal_anypose" type="checkbox"> Any pose (sitting / lying)</label>
+      </div>
+      <button class="action" id="m4thermal_run" disabled>Find boundary</button>
+      <button class="action" id="m4thermal_download" disabled>Download mask</button>
+    </div>
+
+    <div id="m4thermal_status" class="m4-status">Open this tab to load OpenCV.js, then upload an image.</div>
+
+    <canvas id="m4thermal_canvasInput" class="m4-input-canvas" width="1" height="1"></canvas>
+
+    <div class="canvas-grid">
+      <div class="canvas-cell">
+        <canvas id="m4thermal_canvasA"></canvas>
+        <div class="cell-label">Top-hat (input &minus; background)</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m4thermal_canvasB"></canvas>
+        <div class="cell-label">Hysteresis (grey) &rarr; accepted blobs (white)</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m4thermal_canvasFinal"></canvas>
+        <div class="cell-label">Final exact boundary</div>
+      </div>
+    </div>
+
+    <div id="m4thermal_result" class="m4-result"></div>
+  </div>
+
+  <div class="figure">
+    <img src="module4/thermal_output/thermal_steps.png" alt="Thermal pipeline steps">
+    <div class="figure-caption">
+      Fig. 3 Offline result of <code>thermal_segmentation.py</code>: input, background
+      estimate, top-hat, hysteresis mask, watershed markers, final boundary. The warm trench walls
+      are fused with the person after the first threshold and are removed by re-thresholding and
+      the relative-warmth test.
+    </div>
+  </div>
+
+  <div class="figure">
+    <img src="module4/SAM_outputs/thermal_SAM2.png" alt="SAM2">
+    <div class="figure-caption">
+      Fig. 4 Offline result of SAM2 segmentation after several iterations of clicks.
+    </div>
+  </div>
+
+  <h2>Scripts</h2>
+  <div class="m4-scroll">
+  <table>
+    <tr><th>Script</th><th>What it does</th></tr>
+    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/rgb_segmentation.py">rgb_segmentation.py</a></td><td>Part 1, RGB boundary (classical)</td></tr>
+    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module4/thermal_segmentation.py">thermal_segmentation.py</a></td><td>Part 2, thermal boundary (classical)</td></tr>
+  </table>
+  </div>
+
+</div>
+
+<!-- ============ MODULE 6 ============ -->
+<div id="module6" class="tab-content">
+
+  <h2>Assignment 6: Optical Flow, Motion Tracking &amp; Structure from Motion</h2>
+
+  <p>
+    GitHub repository:
+    <a href="https://github.com/Armina-Fani/CV_assignments">CV_assignments</a>
+    &mdash;
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module6">module6 folder</a>
+  </p>
+
+  <!-- ---------------- Part A ---------------- -->
+  <h2>Part A: Optical Flow and Two-Frame Tracking</h2>
+
+  <p>
+    Optical flow assigns every pixel a motion vector (how far and in which direction it moved
+    between two frames). From it we can read off <strong>how fast</strong> and <strong>which way</strong>
+    things move, <strong>whether the camera itself moved</strong> (most of the scene moving together),
+    and <strong>which objects move independently</strong> of the camera. Upload a video below to see this
+    live. Dense flow is computed with Farneback's method, and camera motion is found by fitting a
+    pan/zoom/rotation model with RANSAC.
+  </p>
+
+  <div class="application">
+    <div class="controls">
+      <div>
+        <label for="m6_file">Video (.mp4)</label>
+        <input id="m6_file" type="file" accept="video/*">
+      </div>
+      <div>
+        <label for="m6_duration">Seconds to analyse</label>
+        <select id="m6_duration">
+          <option value="10">10</option>
+          <option value="30" selected>30</option>
+          <option value="60">60</option>
+        </select>
+      </div>
+      <div>
+        <label for="m6_fps">Frames analysed per second</label>
+        <select id="m6_fps">
+          <option value="10">10</option>
+          <option value="15" selected>15</option>
+          <option value="30">30 (every frame of a 30 fps video)</option>
+        </select>
+      </div>
+      <div>
+        <label for="m6_width">Processing width</label>
+        <select id="m6_width">
+          <option value="320" selected>320 px</option>
+          <option value="480">480 px</option>
+        </select>
+      </div>
+      <button class="action" id="m6_run" disabled>Analyse</button>
+      <button class="action" id="m6_stop" disabled>Stop</button>
+    </div>
+
+    <div id="m6_status" class="m4-status">Open this tab to load OpenCV.js, then upload a video.</div>
+
+    <video id="m6_preview" controls muted playsinline style="width:100%;max-height:360px;margin-top:10px;background:#000"></video>
+
+    <div class="canvas-grid">
+      <div class="canvas-cell">
+        <canvas id="m6_canvasFrame"></canvas>
+        <div class="cell-label">Frame with flow arrows and moving objects</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m6_canvasFlow"></canvas>
+        <div class="cell-label">Flow colour: hue = direction, brightness = speed</div>
+      </div>
+    </div>
+    <div id="m6_info" class="m4-legend" style="margin-top:8px"></div>
+    <canvas id="m6_chart" style="width:100%;height:170px;margin-top:10px;background:white;border:1px solid #c9d6f2"></canvas>
+
+    <h3>Two-frame tracking check</h3>
+    <p class="m4-legend">
+      Pause the preview at any moment and click the button. Corner points are tracked from that frame
+      to the next with our own Lucas&ndash;Kanade implementation (the derived 2&times;2 equations plus
+      bilinear interpolation). The predictions are then compared with the <em>actual</em> pixel
+      locations, which are found independently by template matching.
+    </p>
+    <div class="controls">
+      <div>
+        <label for="m6_gap">Second frame</label>
+        <select id="m6_gap">
+          <option value="1" selected>the next frame</option>
+          <option value="2">2 frames later</option>
+          <option value="3">3 frames later</option>
+        </select>
+      </div>
+      <button class="action" id="m6_track" disabled>Track from current frame</button>
+    </div>
+    <div id="m6_trackStatus" class="m4-status"></div>
+    <div class="canvas-grid">
+      <div class="canvas-cell">
+        <canvas id="m6_canvasTrack"></canvas>
+        <div class="cell-label">Second frame: yellow = motion, red + = LK prediction, green o = actual</div>
+      </div>
+      <div class="canvas-cell">
+        <canvas id="m6_canvasZoom"></canvas>
+        <div class="cell-label">Zoom on the worked-example point (one square = one pixel)</div>
+      </div>
+    </div>
+    <pre id="m6_worked" style="white-space:pre-wrap;font-size:13px"></pre>
+    <div class="m4-scroll"><table id="m6_trackTable"></table></div>
+  </div>
+
+  <p>Offline results from <code>optical_flow.py</code> on my two 30-second videos:</p>
+  <div class="canvas-grid">
+    <div class="canvas-cell">
+      <video controls muted playsinline style="width:100%">
+        <source src="module6/flow_output/video1/flow_video_h264.mp4" type="video/mp4">
+        <source src="module6/flow_output/video1/flow_video.webm" type="video/webm">
+      </video>
+      <div class="cell-label">Video 1: original | flow</div>
+    </div>
+    <div class="canvas-cell">
+      <video controls muted playsinline style="width:100%">
+        <source src="module6/flow_output/video2/flow_video_h264.mp4" type="video/mp4">
+        <source src="module6/flow_output/video2/flow_video.webm" type="video/webm">
+      </video>
+      <div class="cell-label">Video 2: original | flow</div>
+    </div>
+  </div>
+  <div class="figure">
+    <img src="module6/flow_output/video1/motion_over_time.png" alt="Motion over time, video 1">
+    <div class="figure-caption">Fig. 1: Motion over time for video 1 (speed, moving area, camera pan).</div>
+  </div>
+  <div class="figure">
+    <img src="module6/tracking_output/video1/tracking_validation.png" alt="Tracking validation, video 1">
+    <div class="figure-caption">Fig. 2: Two consecutive frames of video 1: LK prediction vs. actual pixel location.</div>
+  </div>
+  <div class="figure">
+    <img src="module6/tracking_output/video2/tracking_validation.png" alt="Tracking validation, video 2">
+    <div class="figure-caption">Fig. 3: The same check for video 2.</div>
+  </div>
+
+  <!-- ---------------- Part B ---------------- -->
+  <h2>Part B: Structure from Motion of a Flat Object (4 Views)</h2>
+
+  <p>
+    Four photos of a flat object were taken from different positions with the phone calibrated in
+    Module 2 (K and lens distortion from <code>camera_calibration.npz</code>). <code>sfm_planar.py</code>:
+  </p>
+  <ol>
+    <li><strong>Matches features</strong> (SIFT) between view 1 and every other view.</li>
+    <li><strong>Fits a homography</strong> for each pair with RANSAC. For points on one plane,
+      \(H = K\,(R + t\,n^T/d)\,K^{-1}\).</li>
+    <li><strong>Decomposes</strong> each homography into the camera's rotation \(R\), translation \(t/d\)
+      and the plane normal \(n\). It keeps the solution with the points in front of the cameras and the same
+      plane normal in all pairs.</li>
+    <li><strong>Sets the scale</strong> from the measured distance between the phone and the object.</li>
+    <li><strong>Triangulates</strong> points seen in all four views from \(P_k = K[R_k\,|\,t_k]\), and
+      outlines the object from its triangulated corners.</li>
+  </ol>
+
+  <div class="canvas-grid">
+    <div class="canvas-cell">
+      <img src="module6/sfm_output/reconstruction_3d.png" alt="Recovered cameras and object">
+      <div class="cell-label">Recovered camera positions and object</div>
+    </div>
+    <div class="canvas-cell">
+      <img src="module6/sfm_output/boundary_2d.png" alt="Recovered boundary">
+      <div class="cell-label">Recovered boundary with side lengths (mm)</div>
+    </div>
+    <div class="canvas-cell">
+      <img src="module6/sfm_output/rectified_object.jpg" alt="Rectified object">
+      <div class="cell-label">Object recreated top-down from view 1</div>
+    </div>
+  </div>
+
+  <p>
+    <a href="module6/sfm_output/sfm_workout.txt">Full step-by-step calculations</a> |
+    <a href="module6/sfm_output/cameras.csv">Camera positions</a> |
+    <a href="https://github.com/Armina-Fani/CV_assignments/tree/main/module6/sfm_images">The four photos</a>
+  </p>
+
+  <h2>Scripts</h2>
+  <div class="m4-scroll">
+  <table>
+    <tr><th>Script</th><th>What it does</th></tr>
+    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module6/optical_flow.py">optical_flow.py</a></td><td>Part A: dense flow video and motion analysis</td></tr>
+    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module6/track_validate.py">track_validate.py</a></td><td>Part A: two-frame LK tracking vs. actual pixel locations</td></tr>
+    <tr><td><a href="https://github.com/Armina-Fani/CV_assignments/blob/main/module6/sfm_planar.py">sfm_planar.py</a></td><td>Part B: planar structure from motion from 4 views</td></tr>
+  </table>
+  </div>
+
+</div>
+
+<script>
+  // Original calibration-image dimensions
+  const calibrationWidth = 4284;
+  const calibrationHeight = 5712;
+
+  // Intrinsic calibration parameters
+  const originalFx = 4421.4254;
+  const originalFy = 4432.1984;
+  const originalCx = 2169.3365;
+  const originalCy = 2786.7045;
+
+  const canvas = document.getElementById("imageCanvas");
+  const context = canvas.getContext("2d");
+  const resultBox = document.getElementById("measurementResult");
+  const instructions = document.getElementById("instructions");
+  const downloadButton = document.getElementById("downloadButton");
+  const warningBox = document.getElementById("dimensionWarning");
+
+  let loadedImage = null;
+  let selectedPoints = [];
+
+  function showTab(id, button) {
+    document.querySelectorAll(".tab-content").forEach(element => {
+      element.classList.remove("active");
+    });
+
+    document.querySelectorAll(".tab-button").forEach(element => {
+      element.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+    button.classList.add("active");
+
+    // Module 4 needs OpenCV.js (~8 MB); load it only when that tab is opened.
+    if ((id === "module4" || id === "module6") && typeof m4LoadOpenCV === "function") {
+      m4LoadOpenCV(() => {});
+    }
+  }
+
+  document.getElementById("imageInput").addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const image = new Image();
+
+    image.onload = function () {
+      loadedImage = image;
+      selectedPoints = [];
+
+      // Limit display size without changing measurement accuracy.
+      const maximumCanvasDimension = 1400;
+      const displayScale = Math.min(
+        1,
+        maximumCanvasDimension / Math.max(image.naturalWidth, image.naturalHeight)
+      );
+
+      canvas.width = Math.round(image.naturalWidth * displayScale);
+      canvas.height = Math.round(image.naturalHeight * displayScale);
+      canvas.style.display = "block";
+
+      const calibrationRatio = calibrationWidth / calibrationHeight;
+      const uploadedRatio = image.naturalWidth / image.naturalHeight;
+      const ratioDifference = Math.abs(uploadedRatio - calibrationRatio);
+
+      if (ratioDifference > 0.03) {
+        warningBox.style.display = "block";
+        warningBox.textContent =
+          "Warning: this image has a different orientation or aspect ratio " +
+          "from the 4284 × 5712 calibration images. For reliable results, " +
+          "use images from the calibrated camera with the same orientation, " +
+          "resolution settings, and zoom.";
+      } else {
+        warningBox.style.display = "none";
+      }
+
+      resultBox.style.display = "none";
+      downloadButton.disabled = true;
+      instructions.textContent =
+        "Click the first endpoint of the object dimension.";
+
+      redrawCanvas();
+    };
+
+    image.src = URL.createObjectURL(file);
+  });
+
+  canvas.addEventListener("click", event => {
+    if (!loadedImage || selectedPoints.length >= 2) return;
+
+    const rectangle = canvas.getBoundingClientRect();
+
+    const x = (event.clientX - rectangle.left) *
+              (canvas.width / rectangle.width);
+
+    const y = (event.clientY - rectangle.top) *
+              (canvas.height / rectangle.height);
+
+    selectedPoints.push({ x, y });
+
+    if (selectedPoints.length === 1) {
+      instructions.textContent =
+        "First point selected. Click the second endpoint.";
+    } else {
+      calculateMeasurement();
+    }
+
+    redrawCanvas();
+  });
+
+  function calculateMeasurement() {
+    const distanceZ =
+      Number(document.getElementById("distanceInput").value);
+
+    if (!Number.isFinite(distanceZ) || distanceZ <= 0) {
+      alert("Enter a valid positive camera distance in millimeters.");
+      selectedPoints = [];
+      redrawCanvas();
+      return;
+    }
+
+    /*
+      Scale the intrinsic matrix from the original calibration resolution
+      to the resized browser canvas.
+    */
+    const scaleX = canvas.width / calibrationWidth;
+    const scaleY = canvas.height / calibrationHeight;
+
+    const fx = originalFx * scaleX;
+    const fy = originalFy * scaleY;
+    const cx = originalCx * scaleX;
+    const cy = originalCy * scaleY;
+
+    const first = selectedPoints[0];
+    const second = selectedPoints[1];
+
+    const X1 = (first.x - cx) * distanceZ / fx;
+    const Y1 = (first.y - cy) * distanceZ / fy;
+    const X2 = (second.x - cx) * distanceZ / fx;
+    const Y2 = (second.y - cy) * distanceZ / fy;
+
+    const distanceMillimeters = Math.sqrt(
+      Math.pow(X2 - X1, 2) +
+      Math.pow(Y2 - Y1, 2)
+    );
+
+    resultBox.dataset.distance = distanceMillimeters.toString();
+    resultBox.style.display = "block";
+
+    resultBox.innerHTML =
+      "<strong>Estimated dimension:</strong> " +
+      distanceMillimeters.toFixed(2) + " mm (" +
+      (distanceMillimeters / 10).toFixed(2) + " cm)<br>" +
+      "<small>P1 = (" + X1.toFixed(2) + ", " + Y1.toFixed(2) +
+      ") mm; P2 = (" + X2.toFixed(2) + ", " +
+      Y2.toFixed(2) + ") mm at Z = " +
+      distanceZ.toFixed(2) + " mm.</small>";
+
+    instructions.textContent =
+      "Measurement complete. Reset the points to measure again.";
+
+    downloadButton.disabled = false;
+  }
+
+  function redrawCanvas() {
+    if (!loadedImage) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
+
+    context.lineWidth = Math.max(3, canvas.width / 400);
+    context.font = `bold ${Math.max(18, canvas.width / 35)}px Arial`;
+
+    selectedPoints.forEach(point => {
+      context.beginPath();
+      context.arc(
+        point.x,
+        point.y,
+        Math.max(6, canvas.width / 180),
+        0,
+        Math.PI * 2
+      );
+      context.fillStyle = "red";
+      context.fill();
+    });
+
+    if (selectedPoints.length === 2) {
+      const first = selectedPoints[0];
+      const second = selectedPoints[1];
+
+      context.beginPath();
+      context.moveTo(first.x, first.y);
+      context.lineTo(second.x, second.y);
+      context.strokeStyle = "#00d000";
+      context.stroke();
+
+      const distance = Number(resultBox.dataset.distance);
+      if (Number.isFinite(distance)) {
+        const middleX = (first.x + second.x) / 2;
+        const middleY = (first.y + second.y) / 2;
+
+        const label =
+          distance.toFixed(1) + " mm (" +
+          (distance / 10).toFixed(2) + " cm)";
+
+        context.lineWidth = 5;
+        context.strokeStyle = "black";
+        context.strokeText(label, middleX + 10, middleY - 10);
+        context.fillStyle = "#00ff00";
+        context.fillText(label, middleX + 10, middleY - 10);
+      }
+    }
+  }
+
+  function resetPoints() {
+    selectedPoints = [];
+    resultBox.style.display = "none";
+    delete resultBox.dataset.distance;
+    downloadButton.disabled = true;
+
+    instructions.textContent = loadedImage
+      ? "Click the first endpoint of the object dimension."
+      : "Upload an image, then click the two endpoints.";
+
+    redrawCanvas();
+  }
+
+  function downloadResult() {
+    if (selectedPoints.length !== 2) return;
+
+    const link = document.createElement("a");
+    link.download = "measured_object.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  // ================================================================
+  // MODULE 3: Spatial vs. frequency-domain blur
+  // ================================================================
+
+  const M3_MAX_DIM = 380; // resized processing dimension, for browser performance
+
+  const m3ImageInput = document.getElementById("blurImageInput");
+  const m3FilterTypeSelect = document.getElementById("filterTypeSelect");
+  const m3KernelSizeSelect = document.getElementById("kernelSizeSelect");
+  const m3ApplySpatialButton = document.getElementById("applySpatialButton");
+  const m3ApplyFrequencyButton = document.getElementById("applyFrequencyButton");
+  const m3Status = document.getElementById("m3Status");
+  const m3Result = document.getElementById("m3Result");
+  const m3CanvasOriginal = document.getElementById("m3CanvasOriginal");
+  const m3CanvasSpatial = document.getElementById("m3CanvasSpatial");
+  const m3CanvasSpecBefore = document.getElementById("m3CanvasSpecBefore");
+  const m3CanvasSpecAfter = document.getElementById("m3CanvasSpecAfter");
+  const m3CanvasFrequency = document.getElementById("m3CanvasFrequency");
+
+  let m3GrayImage = null; // Float64Array, length H*W
+  let m3H = 0, m3W = 0;
+  let m3SpatialResult = null;
+  let m3SpatialTimeMs = 0;
+  let m3UsedFilterType = null;
+  let m3UsedKernelSize = null;
+
+  m3ImageInput.addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const image = new Image();
+    image.onload = function () {
+      const scale = Math.min(1, M3_MAX_DIM / Math.max(image.naturalWidth, image.naturalHeight));
+      m3W = Math.max(1, Math.round(image.naturalWidth * scale));
+      m3H = Math.max(1, Math.round(image.naturalHeight * scale));
+
+      const off = document.createElement("canvas");
+      off.width = m3W;
+      off.height = m3H;
+      const offCtx = off.getContext("2d");
+      offCtx.drawImage(image, 0, 0, m3W, m3H);
+      const data = offCtx.getImageData(0, 0, m3W, m3H).data;
+
+      m3GrayImage = new Float64Array(m3W * m3H);
+      for (let i = 0; i < m3W * m3H; i++) {
+        const r = data[i * 4], g = data[i * 4 + 1], b = data[i * 4 + 2];
+        m3GrayImage[i] = 0.299 * r + 0.587 * g + 0.114 * b; // standard luma
+      }
+
+      m3DrawGray(m3CanvasOriginal, m3GrayImage, m3H, m3W);
+      m3ClearCanvas(m3CanvasSpatial);
+      m3ClearCanvas(m3CanvasSpecBefore);
+      m3ClearCanvas(m3CanvasSpecAfter);
+      m3ClearCanvas(m3CanvasFrequency);
+      m3Result.style.display = "none";
+      m3SpatialResult = null;
+      m3ApplyFrequencyButton.disabled = true;
+      m3ApplySpatialButton.disabled = false;
+      m3Status.textContent = `Loaded (${m3W}×${m3H} after resize). Choose a filter and kernel size, then apply.`;
+    };
+    image.src = URL.createObjectURL(file);
+  });
+
+  // Re-require the spatial step if filter settings change after a run,
+  // so the Fourier comparison always matches the currently selected kernel.
+  m3FilterTypeSelect.addEventListener("change", m3InvalidateSpatial);
+  m3KernelSizeSelect.addEventListener("change", m3InvalidateSpatial);
+
+  function m3InvalidateSpatial() {
+    m3ApplyFrequencyButton.disabled = true;
+    m3SpatialResult = null;
+  }
+
+  function m3ClearCanvas(canvasEl) {
+    canvasEl.width = 1;
+    canvasEl.height = 1;
+    canvasEl.getContext("2d").clearRect(0, 0, 1, 1);
+  }
+
+  function m3DrawGray(canvasEl, arr, H, W) {
+    canvasEl.width = W;
+    canvasEl.height = H;
+    const ctx = canvasEl.getContext("2d");
+    const imgData = ctx.createImageData(W, H);
+    for (let i = 0; i < W * H; i++) {
+      const v = Math.max(0, Math.min(255, arr[i]));
+      imgData.data[i * 4] = v;
+      imgData.data[i * 4 + 1] = v;
+      imgData.data[i * 4 + 2] = v;
+      imgData.data[i * 4 + 3] = 255;
+    }
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  // ---- kernel builders (box / gaussian), matching blur_fourier_equivalence.py ----
+
+  function m3GaussianKernel1D(k) {
+    const sigma = 0.3 * ((k - 1) * 0.5 - 1) + 0.8; // OpenCV's default sigma formula
+    const half = Math.floor(k / 2);
+    const values = [];
+    let sum = 0;
+    for (let i = -half; i <= half; i++) {
+      const v = Math.exp(-(i * i) / (2 * sigma * sigma));
+      values.push(v);
+      sum += v;
+    }
+    return values.map(v => v / sum);
+  }
+
+  function m3MakeKernel(type, k) {
+    const kernel = [];
+    if (type === "box") {
+      const val = 1 / (k * k);
+      for (let y = 0; y < k; y++) kernel.push(new Float64Array(k).fill(val));
+    } else {
+      const g = m3GaussianKernel1D(k);
+      for (let y = 0; y < k; y++) {
+        const row = new Float64Array(k);
+        for (let x = 0; x < k; x++) row[x] = g[y] * g[x];
+        kernel.push(row);
+      }
+    }
+    return kernel;
+  }
+
+  // ---- direct spatial convolution (zero-padded border) ----
+
+  function m3SpatialConvolve(imgFlat, H, W, kernel, kh, kw) {
+    const cy = Math.floor(kh / 2), cx = Math.floor(kw / 2);
+    const out = new Float64Array(H * W);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        let sum = 0;
+        for (let j = 0; j < kh; j++) {
+          const yy = y + j - cy;
+          if (yy < 0 || yy >= H) continue;
+          const rowOffset = yy * W;
+          const kRow = kernel[j];
+          for (let i = 0; i < kw; i++) {
+            const xx = x + i - cx;
+            if (xx < 0 || xx >= W) continue;
+            sum += imgFlat[rowOffset + xx] * kRow[i];
+          }
+        }
+        out[y * W + x] = sum;
+      }
+    }
+    return out;
+  }
+
+  // ---- FFT-based frequency-domain convolution ----
+  // Verified against OpenCV's filter2D reference (max abs diff ~1e-13) before
+  // being used here; see build notes for the standalone Node.js test.
+
+  function m3Fft1D(re, im, invert) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i++) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) {
+        [re[i], re[j]] = [re[j], re[i]];
+        [im[i], im[j]] = [im[j], im[i]];
+      }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = (2 * Math.PI / len) * (invert ? 1 : -1);
+      const wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let curWr = 1, curWi = 0;
+        for (let j = 0; j < len / 2; j++) {
+          const ur = re[i + j], ui = im[i + j];
+          const vr = re[i + j + len / 2] * curWr - im[i + j + len / 2] * curWi;
+          const vi = re[i + j + len / 2] * curWi + im[i + j + len / 2] * curWr;
+          re[i + j] = ur + vr;
+          im[i + j] = ui + vi;
+          re[i + j + len / 2] = ur - vr;
+          im[i + j + len / 2] = ui - vi;
+          const nextWr = curWr * wr - curWi * wi;
+          const nextWi = curWr * wi + curWi * wr;
+          curWr = nextWr;
+          curWi = nextWi;
+        }
+      }
+    }
+    if (invert) {
+      for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+    }
+  }
+
+  function m3Fft2D(re, im, invert) {
+    const N = re.length;
+    for (let y = 0; y < N; y++) m3Fft1D(re[y], im[y], invert);
+    for (let x = 0; x < N; x++) {
+      const colRe = new Float64Array(N), colIm = new Float64Array(N);
+      for (let y = 0; y < N; y++) { colRe[y] = re[y][x]; colIm[y] = im[y][x]; }
+      m3Fft1D(colRe, colIm, invert);
+      for (let y = 0; y < N; y++) { re[y][x] = colRe[y]; im[y][x] = colIm[y]; }
+    }
+  }
+
+  function m3NextPow2(n) { let p = 1; while (p < n) p <<= 1; return p; }
+
+  // Log-magnitude spectrum, fftshifted (DC moved to center, the conventional
+  // way to display a Fourier spectrum) and normalized to 0-255 for display.
+  function m3LogMagnitudeShifted(re, im, N) {
+    const mag = new Float64Array(N * N);
+    let maxVal = 0;
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const v = Math.log1p(Math.hypot(re[y][x], im[y][x]));
+        mag[y * N + x] = v;
+        if (v > maxVal) maxVal = v;
+      }
+    }
+    const half = N / 2;
+    const scale = maxVal > 0 ? 255 / maxVal : 0;
+    const out = new Float64Array(N * N);
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const sy = (y + half) % N, sx = (x + half) % N;
+        out[y * N + x] = mag[sy * N + sx] * scale;
+      }
+    }
+    return out;
+  }
+
+  function m3FftConvolve2D(imgFlat, H, W, kernel2D, kh, kw) {
+    const outH = H + kh - 1, outW = W + kw - 1;
+    const N = Math.max(m3NextPow2(outH), m3NextPow2(outW));
+
+    const imgRe = [], imgIm = [];
+    for (let y = 0; y < N; y++) { imgRe.push(new Float64Array(N)); imgIm.push(new Float64Array(N)); }
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++)
+        imgRe[y][x] = imgFlat[y * W + x];
+
+    const kerRe = [], kerIm = [];
+    for (let y = 0; y < N; y++) { kerRe.push(new Float64Array(N)); kerIm.push(new Float64Array(N)); }
+    const cy = Math.floor(kh / 2), cx = Math.floor(kw / 2);
+    for (let y = 0; y < kh; y++) {
+      for (let x = 0; x < kw; x++) {
+        const yy = ((y - cy) % N + N) % N;
+        const xx = ((x - cx) % N + N) % N;
+        kerRe[yy][xx] = kernel2D[y][x];
+      }
+    }
+
+    m3Fft2D(imgRe, imgIm, false);
+    m3Fft2D(kerRe, kerIm, false);
+
+    // Spectrum of the image BEFORE smoothing (F(u,v), the forward FFT above)
+    const specBefore = m3LogMagnitudeShifted(imgRe, imgIm, N);
+
+    const outRe = [], outIm = [];
+    for (let y = 0; y < N; y++) {
+      outRe.push(new Float64Array(N)); outIm.push(new Float64Array(N));
+      for (let x = 0; x < N; x++) {
+        const ar = imgRe[y][x], ai = imgIm[y][x];
+        const br = kerRe[y][x], bi = kerIm[y][x];
+        outRe[y][x] = ar * br - ai * bi;
+        outIm[y][x] = ar * bi + ai * br;
+      }
+    }
+
+    // Spectrum AFTER smoothing -- this is F(u,v)*H(u,v), still in the
+    // frequency domain, before the inverse transform. High-frequency energy
+    // should visibly shrink relative to specBefore -- that's the low-pass
+    // filtering, made visible in frequency space.
+    const specAfter = m3LogMagnitudeShifted(outRe, outIm, N);
+
+    m3Fft2D(outRe, outIm, true);
+
+    const result = new Float64Array(H * W);
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++)
+        result[y * W + x] = outRe[y][x];
+
+    return { result, specBefore, specAfter, N };
+  }
+
+  // ---- UI actions ----
+
+  function m3ApplySpatial() {
+    if (!m3GrayImage) return;
+    const filterType = m3FilterTypeSelect.value;
+    const k = parseInt(m3KernelSizeSelect.value, 10);
+
+    m3Status.textContent = "Applying spatial filter...";
+    m3ApplySpatialButton.disabled = true;
+
+    // Yield to the browser so the status message paints before the (synchronous) computation runs.
+    setTimeout(() => {
+      const kernel = m3MakeKernel(filterType, k);
+      const t0 = performance.now();
+      const result = m3SpatialConvolve(m3GrayImage, m3H, m3W, kernel, k, k);
+      const elapsed = performance.now() - t0;
+
+      m3SpatialResult = result;
+      m3SpatialTimeMs = elapsed;
+      m3UsedFilterType = filterType;
+      m3UsedKernelSize = k;
+
+      m3DrawGray(m3CanvasSpatial, result, m3H, m3W);
+      m3ClearCanvas(m3CanvasSpecBefore);
+      m3ClearCanvas(m3CanvasSpecAfter);
+      m3ClearCanvas(m3CanvasFrequency);
+      m3Result.style.display = "none";
+
+      m3Status.textContent =
+        `Spatial ${filterType} filter (k=${k}) applied in ${elapsed.toFixed(2)} ms. ` +
+        `Now compute its Fourier-domain equivalent to compare.`;
+
+      m3ApplySpatialButton.disabled = false;
+      m3ApplyFrequencyButton.disabled = false;
+    }, 10);
+  }
+
+  function m3ApplyFrequency() {
+    if (!m3GrayImage || !m3SpatialResult) return;
+
+    m3Status.textContent = "Computing Fourier-domain equivalent...";
+    m3ApplyFrequencyButton.disabled = true;
+
+    setTimeout(() => {
+      const kernel = m3MakeKernel(m3UsedFilterType, m3UsedKernelSize);
+      const t0 = performance.now();
+      const { result: freqResult, specBefore, specAfter, N } =
+        m3FftConvolve2D(m3GrayImage, m3H, m3W, kernel, m3UsedKernelSize, m3UsedKernelSize);
+      const elapsed = performance.now() - t0;
+
+      m3DrawGray(m3CanvasSpecBefore, specBefore, N, N);
+      m3DrawGray(m3CanvasSpecAfter, specAfter, N, N);
+      m3DrawGray(m3CanvasFrequency, freqResult, m3H, m3W);
+
+      // Numeric comparison against the spatial result (still computed, just
+      // no longer shown as an image -- reported as text below instead).
+      let maxDiff = 0, sumDiff = 0;
+      for (let i = 0; i < freqResult.length; i++) {
+        const d = Math.abs(freqResult[i] - m3SpatialResult[i]);
+        if (d > maxDiff) maxDiff = d;
+        sumDiff += d;
+      }
+      const meanDiff = sumDiff / freqResult.length;
+
+      m3Result.style.display = "block";
+      m3Result.innerHTML =
+        `<strong>${m3UsedFilterType} filter, k=${m3UsedKernelSize}:</strong><br>` +
+        `Spatial time: ${m3SpatialTimeMs.toFixed(2)} ms &nbsp;|&nbsp; ` +
+        `Frequency-domain time: ${elapsed.toFixed(2)} ms<br>` +
+        `Mean |difference| (spatial vs. inverse-FFT result): ${meanDiff.toExponential(3)} &nbsp;|&nbsp; ` +
+        `Max |difference|: ${maxDiff.toExponential(3)}<br>`;
+
+      m3Status.textContent = "Comparison complete.";
+      m3ApplyFrequencyButton.disabled = false;
+    }, 10);
+  }
+</script>
+
+<!-- Module 4: browser version of the segmentation scripts -->
+<script src="module4/module4.js"></script>
+<!-- Module 6: browser version of the optical-flow / tracking scripts -->
+<script src="module6/module6.js"></script>
+<!-- Module 4: renders the LaTeX equations in the theory section -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</body>
+</html>
